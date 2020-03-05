@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-05T11:45:04.441Z</updated>
+    <updated>2020-03-05T11:46:01.891Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -10,6 +10,52 @@
     <logo>https://pxygogogo.github.io/images/avatar.png</logo>
     <icon>https://pxygogogo.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[微信小程序页面跳转的一系列注意点]]></title>
+        <id>https://pxygogogo.github.io/post/nagivation-problems/</id>
+        <link href="https://pxygogogo.github.io/post/nagivation-problems/">
+        </link>
+        <updated>2020-02-13T11:34:54.000Z</updated>
+        <content type="html"><![CDATA[<ol>
+<li>
+<p>showModel 回调无法跳转除TabBar之外的页面</p>
+<ul>
+<li>回调中只能使用switchTab进行跳转</li>
+</ul>
+</li>
+<li>
+<p>switchTab跳转后页面不刷新</p>
+<ul>
+<li>
+<p>法一：switchTab成功跳转后调用success,此时可以拿到跳转后页面的page对象,从而调用页面onLoad方法重载页面</p>
+<pre><code class="language-javascript">wx.switchTab({
+    url: '/pages/index/index',
+    success: function(e) {
+        let page = getCurrentPages().pop();
+        if (page == undefined || page == null) return;
+        page.onLoad();
+    }
+})
+</code></pre>
+</li>
+<li>
+<p>法二：当switchTab点击过的时候，只有第一次加载数据，第二次点击的时候是不刷新数据的，这个时候只要在需要每次点击都需要刷新数据的TabBar页的js里加上onShow的方法即可</p>
+<pre><code class="language-javascript"> onShow:function(e){
+       this.onLoad();
+ },
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>TabBar页面只能使用switchTab跳转</p>
+<ul>
+<li>文档里有写，使用时需注意</li>
+</ul>
+</li>
+</ol>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Hello Gridea]]></title>
         <id>https://pxygogogo.github.io/post/hello-gridea/</id>
