@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>ssh 免密码快速登录（MacOs） | 小潘的博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://pxygogogo.github.io/favicon.ico?v=1583409384107">
+<link rel="stylesheet" href="https://pxygogogo.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.创建秘钥文件
+
+打开终端，执行 ssh-keygen 命令创建密钥对：
+
+
+ssh-keygen -t rsa -C 'your email@domain.com'
+-t 指定密钥类型，默认即 rsa ，可以省略
+-C 设置注释文字，比..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://pxygogogo.github.io">
+        <img src="https://pxygogogo.github.io/images/avatar.png?v=1583409384107" class="site-logo">
+        <h1 class="site-title">小潘的博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      平凡的世界
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://pxygogogo.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">ssh 免密码快速登录（MacOs）</h2>
+            <div class="post-date">2020-03-05</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="1创建秘钥文件">1.创建秘钥文件</h2>
+<ul>
+<li>打开终端，执行 ssh-keygen 命令创建密钥对：</li>
+</ul>
+<blockquote>
+<pre><code class="language-bash">ssh-keygen -t rsa -C 'your email@domain.com'
+-t 指定密钥类型，默认即 rsa ，可以省略
+-C 设置注释文字，比如你的邮箱，可以省略
+</code></pre>
+</blockquote>
+<ul>
+<li>生成过程中会提示输入密码两次，如果不想在使用公钥的时候输入密码，可以回车跳过；<br>
+密钥默认保存位置在 <code>~/.ssh</code> 目录下，打开后会看到私钥文件 <code>id_rsa</code> 和公钥文件 <code>id_rsa.pub</code>；</li>
+</ul>
+<h2 id="2复制公钥至服务器">2.复制公钥至服务器</h2>
+<ul>
+<li>
+<p>通过宝塔面板直接将<code>~/.ssh/id_rsa.pub</code>配置到服务器的<code>~/.ssh/authorized_keys</code>文件中</p>
+</li>
+<li>
+<p>使用 scp 命令将本地的公钥文件 <code>id_rsa.pub</code> 复制到需要连接的Linux服务器：</p>
+<pre><code class="language-bash">scp ~/.ssh/id_rsa.pub &lt;用户名&gt;@&lt;ip地址&gt;:/home/id_rsa.pub
+</code></pre>
+</li>
+<li>
+<p>如果修改了ssh默认连接端口的话，需要加上端口信息：</p>
+<pre><code class="language-bash">scp -P &lt;端口号&gt; ~/.ssh/id_rsa.pub &lt;用户名&gt;@&lt;ip地址&gt;:/home/id_rsa.pub
+</code></pre>
+</li>
+<li>
+<p>把公钥追加到服务器ssh认证文件中:</p>
+<pre><code class="language-bash">cat /home/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys
+</code></pre>
+</li>
+<li>
+<p>这时候在本地终端中使用用户名和ip登录就不需要密码了：</p>
+<pre><code class="language-xml">ssh &lt;用户名&gt;@&lt;ip&gt;
+</code></pre>
+</li>
+<li>
+<p>如果修改了ssh默认连接端口的话，需要加上端口信息：</p>
+<pre><code class="language-xml">ssh -p &lt;端口号&gt; &lt;用户名&gt;@&lt;ip地址&gt;
+</code></pre>
+</li>
+</ul>
+<h2 id="3配置快捷登录">3.配置快捷登录</h2>
+<ul>
+<li>在本地 <code>~/.ssh/config</code> 配置文件中添加ssh服务器信息（可多个），格式：</li>
+</ul>
+<blockquote>
+<pre><code class="language-ruby">Host            alias            #自定义别名
+HostName        hostname         #替换为你的ssh服务器ip或domain
+Port            port             #ssh服务器端口，默认为22
+User            user             #ssh服务器用户名
+IdentityFile    ~/.ssh/id_rsa    #第一个步骤生成的公钥文件对应的私钥文件
+</code></pre>
+</blockquote>
+<ul>
+<li>配置成功后，即可直接通过<code>ssh alias</code>登录</li>
+</ul>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://pxygogogo.github.io/post/nagivation-problems/">
+                  <h3 class="post-title">
+                    微信小程序页面跳转的一系列注意点
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
