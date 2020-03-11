@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Hello Gridea | 小潘的博客</title>
+<title>Mongoose得到的对象不能增加属性解决方法（两种） | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,15 +18,16 @@
 
 
 
-    <meta name="description" content="👏  欢迎使用 Gridea ！
-✍️  Gridea 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...
+    <meta name="description" content="实例
 
-Github
-Gridea 主页
-示例网站
-特性👇
-📝  你可以使用最酷的 Markdo..." />
-    <meta name="keywords" content="Gridea" />
+Notice模型文件如下：
+
+const mongoose = require('mongoose');
+
+const schema = mongoose.Schema({
+    userId:{type:String},
+   ..." />
+    <meta name="keywords" content="mongoose" />
   </head>
   <body>
     <div id="app" class="main">
@@ -97,45 +98,88 @@ Gridea 主页
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">Hello Gridea</h2>
-            <div class="post-date">2018-12-12</div>
-            
-              <div class="feature-container" style="background-image: url('https://pxygogogo.github.io/post-images/hello-gridea.png')">
-              </div>
+            <h2 class="post-title">Mongoose得到的对象不能增加属性解决方法（两种）</h2>
+            <div class="post-date">2020-03-11</div>
             
             <div class="post-content" v-pre>
-              <p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-<!-- more -->
-<p><a href="https://github.com/getgridea/gridea">Github</a><br>
-<a href="https://gridea.dev/">Gridea 主页</a><br>
-<a href="http://fehey.com/">示例网站</a></p>
-<h2 id="特性">特性👇</h2>
-<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
-<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
-<p>🏷️  你可以对文章进行标签分组</p>
-<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
-<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
-<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
-<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
-<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
-<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
-<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
-<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
-<p>未来，它一定会成为你离不开的伙伴</p>
-<p>尽情发挥你的才华吧！</p>
-<p>😘 Enjoy~</p>
+              <h2 id="实例">实例</h2>
+<ul>
+<li>Notice模型文件如下：</li>
+</ul>
+<pre><code>const mongoose = require('mongoose');
+
+const schema = mongoose.Schema({
+    userId:{type:String},
+    time: {type:String},
+    medicines: {type:Array},
+    noticePerson:{type:String},
+    acrtTime:{type:String},
+});
+
+module.exports = mongoose.model('Notice',schema);
+</code></pre>
+<ul>
+<li>路由响应如下：</li>
+</ul>
+<pre><code>router.post('/notices', async (req, res) =&gt; {
+            const {email} = await User.findById(req.id, {email: 1});
+            const result = await Notice.create(req.body);
+            result.email = email; //无法生效
+            res.send(result);
+        }
+    });
+</code></pre>
+<ul>
+<li>问题描述：<br>
+希望向得到的result数据中添加一个email属性，但直接添加无法成功</li>
+</ul>
+<hr>
+<h2 id="原因">原因</h2>
+<ul>
+<li>因为Mongoose是個ODM (Object Document Mapper)，类似于操作关系型数据库使用的ORM(Object Relational Mapper)，我们使用Mongoose取到的数据的结构是要依赖于我们定义的schema结构的。增加的email属性在schema中没有定义，所以我们在取到的结果中增加email属性是无效的</li>
+</ul>
+<hr>
+<h2 id="解决办法">解决办法</h2>
+<ul>
+<li>解决办法一</li>
+</ul>
+<p><mark>在schema中直接增加需要补充的属性</mark></p>
+<p>在本例中即向Notice模型中添加一个email字段</p>
+<ul>
+<li>解决办法二</li>
+</ul>
+<p><mark>把查询到的结果clone一个对象，然后在新对象中补充属性</mark></p>
+<pre><code>router.post('/notices', async (req, res) =&gt; {
+            const {email} = await User.findById(req.id, {email: 1});
+            const result = await Notice.create(req.body);
+            const data = {
+                ...result._doc,
+                email,
+            };
+            res.send(data);
+        }
+    });
+</code></pre>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://pxygogogo.github.io/tag/WecgcPgZG/" class="tag">
-                    Gridea
+                  <a href="https://pxygogogo.github.io/tag/mongoose/" class="tag">
+                    mongoose
                   </a>
                 
               </div>
             
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://pxygogogo.github.io/post/ssh-login/">
+                  <h3 class="post-title">
+                    ssh 免密码快速登录（MacOs）
+                  </h3>
+                </a>
+              </div>
             
 
             
