@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-13T05:40:16.890Z</updated>
+    <updated>2020-03-13T13:07:15.836Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -340,6 +340,47 @@ IdentityFile    ~/.ssh/id_rsa    #第一个步骤生成的公钥文件对应的�
 </ul>
 </li>
 </ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[js实现深浅拷贝]]></title>
+        <id>https://pxygogogo.github.io/post/js-copy/</id>
+        <link href="https://pxygogogo.github.io/post/js-copy/">
+        </link>
+        <updated>2020-01-01T13:01:14.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="实现浅拷贝">实现浅拷贝</h2>
+<ul>
+<li>一、...实现</li>
+</ul>
+<pre><code>let copy = {...{a:1}};
+</code></pre>
+<ul>
+<li>二、Object.assign实现</li>
+</ul>
+<pre><code>let copy = Object.assign({},{a:1});
+</code></pre>
+<h2 id="实现深拷贝">实现深拷贝</h2>
+<ul>
+<li>一、JSON.stringify()/JSON.parse()实现</li>
+</ul>
+<pre><code>let obj = {a: 1, b: {x: 3}};
+let deepCopy = JSON.parse(JSON.stringify(obj));
+</code></pre>
+<p><mark>注：这种方法实施的前提必须是实施的对象是JSON安全的</mark></p>
+<ul>
+<li>二、递归拷贝</li>
+</ul>
+<pre><code>function deepClone(obj) {
+    let copy = obj.instanceof Arrary ? [] : {};
+    for (let i in obj) {
+        if(obj.hasOwnProperty(i)) {
+            copy[i] = typeof obj[i] === 'object' ? deepClone(obj[i]) : obj[i];
+        }
+    }
+    return copy
+}
+
+</code></pre>
 ]]></content>
     </entry>
 </feed>

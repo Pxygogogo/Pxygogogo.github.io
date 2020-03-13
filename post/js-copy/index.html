@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>ssh | 小潘的博客</title>
+<title>js实现深浅拷贝 | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,21 @@
 
 
 
-    <meta name="description" content="平凡的世界">
+    <meta name="description" content="实现浅拷贝
+
+一、...实现
+
+let copy = {...{a:1}};
+
+
+二、Object.assign实现
+
+let copy = Object.assign({},{a:1});
+
+实现深拷贝
+
+一、JSON.stringify..." />
+    <meta name="keywords" content="js" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,28 +102,60 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: ssh</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://pxygogogo.github.io/post/ssh-login/">
-                  <h2 class="post-title">ssh 免密码快速登录（MacOs）</h2>
-                </a>
-                <div class="post-date">
-                  2020-03-05
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">js实现深浅拷贝</h2>
+            <div class="post-date">2020-01-01</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="实现浅拷贝">实现浅拷贝</h2>
+<ul>
+<li>一、...实现</li>
+</ul>
+<pre><code>let copy = {...{a:1}};
+</code></pre>
+<ul>
+<li>二、Object.assign实现</li>
+</ul>
+<pre><code>let copy = Object.assign({},{a:1});
+</code></pre>
+<h2 id="实现深拷贝">实现深拷贝</h2>
+<ul>
+<li>一、JSON.stringify()/JSON.parse()实现</li>
+</ul>
+<pre><code>let obj = {a: 1, b: {x: 3}};
+let deepCopy = JSON.parse(JSON.stringify(obj));
+</code></pre>
+<p><mark>注：这种方法实施的前提必须是实施的对象是JSON安全的</mark></p>
+<ul>
+<li>二、递归拷贝</li>
+</ul>
+<pre><code>function deepClone(obj) {
+    let copy = obj.instanceof Arrary ? [] : {};
+    for (let i in obj) {
+        if(obj.hasOwnProperty(i)) {
+            copy[i] = typeof obj[i] === 'object' ? deepClone(obj[i]) : obj[i];
+        }
+    }
+    return copy
+}
 
-          <div class="pagination-container">
-  
-  
-</div>
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://pxygogogo.github.io/tag/js/" class="tag">
+                    js
+                  </a>
+                
+              </div>
+            
+            
+
+            
+
+          </div>
 
         </div>
       </div>
