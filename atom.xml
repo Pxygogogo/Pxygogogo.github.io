@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-11T04:40:58.353Z</updated>
+    <updated>2020-03-13T05:39:48.147Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -10,6 +10,158 @@
     <logo>https://pxygogogo.github.io/images/avatar.png</logo>
     <icon>https://pxygogogo.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[浏览器中堆栈内存的底层处理]]></title>
+        <id>https://pxygogogo.github.io/post/stack-heap-in-browser/</id>
+        <link href="https://pxygogogo.github.io/post/stack-heap-in-browser/">
+        </link>
+        <updated>2020-03-13T05:31:01.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="浏览器执行代码需要经历什么">浏览器执行代码需要经历什么</h2>
+<h3 id="编译">编译</h3>
+<ul>
+<li>词法解析：这个过程会将由字符组成的字符串分解成有意义的代码块（词法单元）</li>
+<li>语法分析：这个过程将词法单元流转换成一个由元素逐级嵌套所组成的代表了程序语法的树（抽象语法树 =&gt; <mark>AST</mark>）</li>
+<li>代码生成：将<mark>AST</mark>转换为可执行代码的过程被称为代码生成</li>
+</ul>
+<h3 id="引擎编译执行代码">引擎编译执行代码</h3>
+<p>然后将构建出的代码交给引擎（V8），这个时候可能会遇到<mark>变量提升、作用域和作用域链/闭包、变量对象、堆栈内存、GO/VO/AO/EC/ECStack</mark>...</p>
+<blockquote>
+<h4 id="几个术语说明">几个术语说明：</h4>
+<p><mark>ECstack</mark>：执行上下文环境栈</p>
+<p><mark>EC</mark>：执行上下文 分为全局执行上下文 <mark>EC(G)</mark> 和函数执行上下文(<mark>EC(...)</mark>)</p>
+<p><mark>GO(Global Object)</mark>：全局对象浏览器端，会把GO赋值给window</p>
+<p><mark>VO(Varible Object)</mark>：变量对象，存储当前上下文中的变量</p>
+<p><mark>AO(Activation Object)</mark>：活动对象，在函数执行上下文中，VO是不能直接访问的，此时由活动对象(activation object,缩写为AO)扮演VO的角色</p>
+</blockquote>
+<p>引擎在编译执行代码的过程中，首先会创建一个执行栈，也就是栈内存（ECStack =&gt; 执行环境栈），然后执行代码</p>
+<p>在代码执行会创建EC(执行上下文)，执行上下文分为全局执行上下文（EC(G)）和函数执行上下文（EC(...)）,其中函数的执行上下文是私有的。</p>
+<p>创建执行上下文的过程中，可能会创建：GO、VO、AO<br>
+然后将进栈执行，创建好的上下文将压缩到栈中执行，执行后一些没用的上下文将出栈，有用的上下文会压缩到栈底（闭包）。栈底永远是全局执行上下文，栈顶则永远是当前执行上下文</p>
+<h3 id="变量赋值的三步操作">变量赋值的三步操作</h3>
+<ul>
+<li>
+<p>第一步，创建变量，这个过程叫做声明(declare)。</p>
+</li>
+<li>
+<p>第二步，创建值。基本类型值会直接在栈中创建和存储；由于引用类型值是复杂的结构，所以需开辟一个存储对象中键值对（存储函数中代码）的内存空间，这个内存就是堆内存，所有的堆内存都有可被后续查找的16进制地址，后续关联赋值时，是把堆内存地址给予变量操作。</p>
+</li>
+<li>
+<p>最后一步，将变量和值关联，这个过程叫做定义(defined)。这里，如果值只经过了声明，而没有进行赋值操作，这个值就是未定义(undefined)。</p>
+</li>
+</ul>
+<blockquote>
+<p>注：简单理解为</p>
+<ul>
+<li>栈内存存放执行代码和基本类型的值</li>
+<li>堆内存存放复杂结构，如对象</li>
+</ul>
+</blockquote>
+<p>例题：</p>
+<pre><code>// 例一
+let a = 12;
+let b = a;
+b = 13;
+console.log(a);
+
+// 例二
+let a = {n:12};
+let b = a;
+b['n'] = 13;
+console.log(a.n);
+
+// 例三
+let a = {n:12};
+let b = a;
+b = {n:13};
+console.log(a.n);
+
+</code></pre>
+<p>例一<br>
+<img src="https://s1.ax1x.com/2020/03/13/8nyz8A.jpg" alt="image" loading="lazy"><br>
+所以本问最终输出的a值为12</p>
+<p>例二<br>
+<img src="https://s1.ax1x.com/2020/03/13/8n6AUg.jpg" alt="image" loading="lazy"><br>
+所以本问最终输出的a.n为13</p>
+<p>例三<br>
+<img src="https://s1.ax1x.com/2020/03/13/8ncQSA.jpg" alt="image" loading="lazy"><br>
+所以本问最终输出的a.n的值为12</p>
+<h3 id="真实面试题">真实面试题</h3>
+<ul>
+<li>题一</li>
+</ul>
+<pre><code>let a = {
+    n: 10
+};
+let b = a;
+b.m = b = {
+    n: 20
+};
+console.log(a);
+console.log(b);
+
+</code></pre>
+<ul>
+<li>解一<br>
+<img src="https://s1.ax1x.com/2020/03/13/8n2zo8.jpg" alt="image" loading="lazy"></li>
+</ul>
+<p>所以最终输出的a为{n: 10, m: {n: 20}};b为{n: 20}</p>
+<ul>
+<li>题二</li>
+</ul>
+<pre><code>let x = [12, 23];
+function fn(y) {
+    y[0] = 100;
+    y = [100];
+    y[1] = 200;
+    console.log(y);
+}
+fn(x);
+console.log(x);
+
+</code></pre>
+<ul>
+<li>解二<br>
+<img src="https://s1.ax1x.com/2020/03/13/8nvnzR.jpg" alt="image" loading="lazy"></li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://s1.ax1x.com/2020/03/13/8nv3dO.jpg" alt="image" loading="lazy"></figure>
+<p>答案是：[100, 200] [100, 23]</p>
+<h3 id="思考题">思考题</h3>
+<ul>
+<li>思考题一</li>
+</ul>
+<pre><code>var x = 10;
+~ function (x) {
+    console.log(x);
+    x = x || 20 &amp;&amp; 30 || 40;
+    console.log(x);
+}();
+console.log(x);
+</code></pre>
+<ul>
+<li>思考题二</li>
+</ul>
+<pre><code>let x = [1, 2],
+    y = [3, 4];
+~ function (x) {
+    x.push('A');
+    x = x.slice(0);
+    x.push('B');
+    x = y;
+    x.push('C');
+    console.log(x, y);
+}(x);
+console.log(x, y);
+</code></pre>
+<ul>
+<li>思考题一答案</li>
+</ul>
+<p><mark>undefined 30 10</mark></p>
+<ul>
+<li>思考题二答案</li>
+</ul>
+<p><mark>[3, 4, 'C'] [3, 4, 'C'] [1, 2, 'A'] [3, 4, 'C']</mark></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Mongoose得到的对象不能增加属性解决方法（两种）]]></title>
         <id>https://pxygogogo.github.io/post/mongoose-query/</id>

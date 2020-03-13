@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>微信小程序页面跳转的一系列注意点 | 小潘的博客</title>
+<title>js | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,19 +18,7 @@
 
 
 
-    <meta name="description" content="
-
-showModel 回调无法跳转除TabBar之外的页面
-
-回调中只能使用switchTab进行跳转
-
-
-
-switchTab跳转后页面不刷新
-
-
-法一：switchTab成功跳转后调用success,此时可以拿到跳转后页面的page对..." />
-    <meta name="keywords" content="微信小程序" />
+    <meta name="description" content="平凡的世界">
   </head>
   <body>
     <div id="app" class="main">
@@ -100,65 +88,28 @@ switchTab跳转后页面不刷新
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <div class="post-detail">
-            <h2 class="post-title">微信小程序页面跳转的一系列注意点</h2>
-            <div class="post-date">2020-02-13</div>
-            
-            <div class="post-content" v-pre>
-              <ol>
-<li>
-<p>showModel 回调无法跳转除TabBar之外的页面</p>
-<ul>
-<li>回调中只能使用switchTab进行跳转</li>
-</ul>
-</li>
-<li>
-<p>switchTab跳转后页面不刷新</p>
-<ul>
-<li>
-<p>法一：switchTab成功跳转后调用success,此时可以拿到跳转后页面的page对象,从而调用页面onLoad方法重载页面</p>
-<pre><code class="language-javascript">wx.switchTab({
-    url: '/pages/index/index',
-    success: function(e) {
-        let page = getCurrentPages().pop();
-        if (page == undefined || page == null) return;
-        page.onLoad();
-    }
-})
-</code></pre>
-</li>
-<li>
-<p>法二：当switchTab点击过的时候，只有第一次加载数据，第二次点击的时候是不刷新数据的，这个时候只要在需要每次点击都需要刷新数据的TabBar页的js里加上onShow的方法即可</p>
-<pre><code class="language-javascript"> onShow:function(e){
-       this.onLoad();
- },
-</code></pre>
-</li>
-</ul>
-</li>
-<li>
-<p>TabBar页面只能使用switchTab跳转</p>
-<ul>
-<li>文档里有写，使用时需注意</li>
-</ul>
-</li>
-</ol>
-
-            </div>
-            
-              <div class="tag-container">
-                
-                  <a href="https://pxygogogo.github.io/tag/wechatmini/" class="tag">
-                    微信小程序
-                  </a>
-                
+          <h2 class="current-tag">标签: js</h2>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://pxygogogo.github.io/post/stack-heap-in-browser/">
+                  <h2 class="post-title">浏览器中堆栈内存的底层处理</h2>
+                </a>
+                <div class="post-date">
+                  2020-03-13
+                </div>
+                <div class="post-abstract">
+                  
+                </div>
               </div>
-            
-            
+              
+            </article>
+          
 
-            
-
-          </div>
+          <div class="pagination-container">
+  
+  
+</div>
 
         </div>
       </div>
