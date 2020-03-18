@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>js实现深浅拷贝 | 小潘的博客</title>
+<title>js中call、apply实现 | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,20 +18,18 @@
 
 
 
-    <meta name="description" content="实现浅拷贝
+    <meta name="description" content="实现call()
 
-一、...实现
-
-let copy = {...{a:1}};
+实现思路
 
 
-二、(ES6)Object.assign实现
 
-let copy = Object.assign({},{a:1});
+改变this指向：可以将目标函数作为这个对象的属性
+利用arguments类数组对象实现参数不定长
+不能增加对象的属性，所以在结尾需要delete
 
-实现深拷贝
 
-一、JSON.stri..." />
+Function.prototype.myCall ..." />
     <meta name="keywords" content="js" />
   </head>
   <body>
@@ -103,42 +101,71 @@ let copy = Object.assign({},{a:1});
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">js实现深浅拷贝</h2>
-            <div class="post-date">2020-01-01</div>
+            <h2 class="post-title">js中call、apply实现</h2>
+            <div class="post-date">2019-12-22</div>
             
             <div class="post-content" v-pre>
-              <h2 id="实现浅拷贝">实现浅拷贝</h2>
+              <h2 id="实现call">实现call()</h2>
 <ul>
-<li>一、...实现</li>
+<li>实现思路</li>
 </ul>
-<pre><code>let copy = {...{a:1}};
-</code></pre>
-<ul>
-<li>二、(ES6)Object.assign实现</li>
-</ul>
-<pre><code>let copy = Object.assign({},{a:1});
-</code></pre>
-<h2 id="实现深拷贝">实现深拷贝</h2>
-<ul>
-<li>一、JSON.stringify()/JSON.parse()实现</li>
-</ul>
-<pre><code>let obj = {a: 1, b: {x: 3}};
-let deepCopy = JSON.parse(JSON.stringify(obj));
-</code></pre>
-<p><mark>注：这种方法实施的前提必须是实施的对象是JSON安全的</mark></p>
-<ul>
-<li>二、递归拷贝</li>
-</ul>
-<pre><code>function deepClone(obj) {
-    let copy = obj.instanceof Arrary ? [] : {};
-    for (let i in obj) {
-        if(obj.hasOwnProperty(i)) {
-            copy[i] = typeof obj[i] === 'object' ? deepClone(obj[i]) : obj[i];
-        }
-    }
-    return copy
+<blockquote>
+<ol>
+<li>改变this指向：可以将目标函数作为这个对象的属性</li>
+<li>利用arguments类数组对象实现参数不定长</li>
+<li>不能增加对象的属性，所以在结尾需要delete</li>
+</ol>
+</blockquote>
+<pre><code>Function.prototype.myCall = function(context){
+    var context = context || window;   
+    context.fn = this;
+    let args = [...arguments].slice(1);
+    context.fn(...args);
+    delete context.fn;
 }
-
+</code></pre>
+<h2 id="实现apply">实现apply()</h2>
+<ul>
+<li>与call（）只有一个区别，apply第二个参数为数组</li>
+</ul>
+<pre><code>Function.prototype.myApply = function(context){
+    var context = context || window;
+    contex.fn = this;
+    // 需要判断是否存储第二个参数
+    // 如果存在，就将第二个参数展开
+    if(argument[1]){
+        context.fn(...argument[1]);
+    }else{
+        context.fn();
+    }
+    
+    delete context.fn;
+}
+</code></pre>
+<h2 id="实现bind">实现bind()</h2>
+<p>返回一个与被调函数具有相同函数体的新函数，且这个新函数也能使用new操作符。</p>
+<p><strong>实现思路</strong></p>
+<blockquote>
+<ol>
+<li>返回一个新函数，可以使用闭包</li>
+<li>bind（）传入的参数长度不定，使用函数内置的arguments对象数组，可利用Array.prototype.slice.call(arguments,1 )将其转化为数组</li>
+<li>返回的新函数中，使用apply改变被调用函数的this指向，将arguments转化成的数组作为apply的第二个参数</li>
+<li>因为返回的新函数也可以使用new操作符，所以在新函数内部需要判断是否使用了new操作符（为什么需要判断，后面会讲解到），如果使用则将apply的第一个参数设置为新创建的对象，如果没有则设置为在调用bind（）时所传入的对象（不传的话默认为window）。</li>
+</ol>
+</blockquote>
+<p>需要注意的是怎么去判断是否使用了new操作符呢？在解决这个问题之前，我们先看使用new操作符时具体干了些什么，下面是new操作符的简单实现过程：</p>
+<pre><code>//简洁版的new操作符实现过程
+ 
+function newFunc(constructor){
+      //第一步：创建一个空对象obj 
+        var obj = {};
+       //第二步：将构造函数 constructor的原型对象赋给obj的原型
+        obj.__proto__ = constructor.prototype;
+      //第三步：将构造函数 constructor中的this指向obj,并立即执行构造函数内部的操作
+        constructor.apply(obj);
+      //第四步：返回这个对象
+        return obj;
+}
 </code></pre>
 
             </div>
@@ -154,9 +181,9 @@ let deepCopy = JSON.parse(JSON.stringify(obj));
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://pxygogogo.github.io/post/js-achieve-bind/">
+                <a href="https://pxygogogo.github.io/post/js-call-apply-bind/">
                   <h3 class="post-title">
-                    js中bind实现
+                    js中call、apply、bind理解
                   </h3>
                 </a>
               </div>

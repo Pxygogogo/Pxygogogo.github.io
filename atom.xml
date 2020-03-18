@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-17T06:09:05.691Z</updated>
+    <updated>2020-03-18T12:18:55.589Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -915,256 +915,295 @@ let deepCopy = JSON.parse(JSON.stringify(obj));
 ]]></content>
     </entry>
     <entry>
-        <title type="html"><![CDATA[this绑定]]></title>
-        <id>https://pxygogogo.github.io/post/js-this/</id>
-        <link href="https://pxygogogo.github.io/post/js-this/">
+        <title type="html"><![CDATA[js中bind实现]]></title>
+        <id>https://pxygogogo.github.io/post/js-achieve-bind/</id>
+        <link href="https://pxygogogo.github.io/post/js-achieve-bind/">
         </link>
-        <updated>2019-12-21T06:05:50.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="this的绑定规则主要有以下五种">this的绑定规则主要有以下五种</h2>
-<ul>
-<li>1、默认绑定（严格/非严格模式）</li>
-<li>2、隐式绑定</li>
-<li>3、显式绑定</li>
-<li>4、new绑定</li>
-<li>5、ES6箭头函数绑定</li>
-</ul>
-<h3 id="1-默认绑定">1、默认绑定</h3>
-<h4 id="11-严格模式">1.1 严格模式</h4>
-<p>在严格模式下，不能将全局对象window作为默认绑定，此时this会绑定到undefined，但是在严格模式下调用函数则不会影响默认绑定。</p>
-<pre><code>(() =&gt; {
-  &quot;use strict&quot;
-  function foo() {
-    console.log(this.name);
-  };
-  var name = &quot;pxy&quot;;
-  foo(); 
-})();
-
-// Uncaught TypeError: Cannot read property 'name' of undefined at foo
-</code></pre>
-<pre><code>var name = 'pxy';
-function foo() {
-  console.log(this.name);
+        <updated>2019-12-22T12:12:50.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="bind">bind()</h2>
+<p>一句话介绍 bind:</p>
+<blockquote>
+<p>bind() 方法会创建一个新函数。当这个新函数被调用时，bind() 的第一个参数将作为它运行时的 this，之后的一序列参数将会在传递的实参前传入作为它的参数。(来自于 MDN )</p>
+</blockquote>
+<p>由此我们可以首先得出 bind 函数的两个特点：</p>
+<ol>
+<li>返回一个函数</li>
+<li>可以传入参数</li>
+</ol>
+<h2 id="返回函数的模拟实现">返回函数的模拟实现</h2>
+<p>从第一个特点开始，我们举个例子：</p>
+<pre><code class="language-js">var foo = {
+    value: 1
 };
 
-(() =&gt; {
-  &quot;use strict&quot;
-  foo();
-})();
+function bar() {
+    console.log(this.value);
+}
 
-// pxy
+// 返回了一个函数
+var bindFoo = bar.bind(foo); 
 
+bindFoo(); // 1
 </code></pre>
-<h4 id="12-非严格模式">1.2 非严格模式</h4>
-<p>在非严格模式下，此时this就指向全局对象</p>
-<p>var name = 'pxy';<br>
-function foo() {<br>
-console.log(this.name);<br>
-}</p>
-<p>foo(); // pxy</p>
-<h3 id="2-默认绑定">2、默认绑定</h3>
-<p>当函数作为对象的属性存在，通过对象属性执行函数时，此时隐式绑定规则会将this绑定到对象上；</p>
-<pre><code>var name = 'pxy';
-function foo() {
-  console.log(this.name);
+<p>关于指定 this 的指向，我们可以使用 call 或者 apply 实现。我们来写第一版的代码：</p>
+<pre><code class="language-js">// 第一版
+Function.prototype.bind2 = function (context) {
+    var self = this;
+    return function () {
+        return self.apply(context);
+    }
+
 }
-
-var obj = {
-  name: 'zl',
-  foo,
-}
-
-obj.foo(); // zl
-
 </code></pre>
-<p>注意上面代码中函数执行方式是通过对象属性执行</p>
-<pre><code>var name = 'pxy';
-function foo() {
-  console.log(this.name);
+<p>此外，之所以 <code>return self.apply(context)</code>，是考虑到绑定函数可能是有返回值的，依然是这个例子：</p>
+<pre><code class="language-js">var foo = {
+    value: 1
+};
+
+function bar() {
+    return this.value;
 }
 
-var obj = {
-  name: 'zl',
-  foo,
-}
+var bindFoo = bar.bind(foo);
 
-foo(); // pxy
-
-var foo1 = obj.foo; 
-
-foo1(); // pxy
-
-obj.foo(); // zl
+console.log(bindFoo()); // 1
 </code></pre>
-<p>由上面代码可以发现，通过赋值操作后执行函数，会应用默认绑定，此时在非严格模式下this会指向全局对象。</p>
-<p>同样的，函数传参也是一种隐式赋值，此时在回调函数中会丢失this绑定。</p>
-<pre><code>function foo() {
-  console.log(this.name);
+<h2 id="传参的模拟实现">传参的模拟实现</h2>
+<p>接下来看第二点，可以传入参数。这个就有点让人费解了，我在 bind 的时候，是否可以传参呢？我在执行 bind 返回的函数的时候，可不可以传参呢？让我们看个例子：</p>
+<pre><code class="language-js">var foo = {
+    value: 1
+};
+
+function bar(name, age) {
+    console.log(this.value);
+    console.log(name);
+    console.log(age);
+
 }
 
-function Foo(fn) {
-  fn();
-}
-
-var obj = {
-  name: 'zl',
-  foo,
-}
-
-var name = 'pxy';
-
-Foo(obj.foo); // pxy
+var bindFoo = bar.bind(foo, 'daisy');
+bindFoo('18');
+// 1
+// daisy
+// 18
 </code></pre>
-<h3 id="3-显示绑定">3、显示绑定</h3>
-<p>通过 call apply bind绑定，主要以call举例</p>
+<p>函数需要传 name 和 age 两个参数，竟然还可以在 bind 的时候，只传一个 name，在执行返回的函数的时候，再传另一个参数 age!</p>
+<p>这可咋办？不急，我们用 arguments 进行处理：</p>
+<pre><code class="language-js">// 第二版
+Function.prototype.bind2 = function (context) {
+
+    var self = this;
+    // 获取bind2函数从第二个参数到最后一个参数
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    return function () {
+        // 这个时候的arguments是指bind返回的函数传入的参数
+        var bindArgs = Array.prototype.slice.call(arguments);
+        return self.apply(context, args.concat(bindArgs));
+    }
+
+}
+</code></pre>
+<h2 id="构造函数效果的模拟实现">构造函数效果的模拟实现</h2>
+<p>完成了这两点，最难的部分到啦！因为 bind 还有一个特点，就是</p>
 <blockquote>
-<p>一句话介绍call：使用一个指定的this和若干个指定的参数调用某个函数或方法。</p>
+<p>一个绑定函数也能使用new操作符创建对象：这种行为就像把原函数当成构造器。提供的 this 值被忽略，同时调用时的参数被提供给模拟函数。</p>
 </blockquote>
-<p>call做的事:</p>
-<ul>
-<li>将函数设为对象的属性</li>
-<li>指定函数的this，并进行传参</li>
-<li>执行&amp;删除函数</li>
-<li>判定如果没有指定要绑定的this，非严格模式下默认指向全局对象</li>
-</ul>
-<p>可以看到值调用call方法后，会将this绑定到指定对象，所以称为显示绑定</p>
-<pre><code>function foo() {
-  console.log(this.name);
+<p>也就是说当 bind 返回的函数作为构造函数的时候，bind 时指定的 this 值会失效，但传入的参数依然生效。举个例子：</p>
+<pre><code class="language-js">var value = 2;
+
+var foo = {
+    value: 1
+};
+
+function bar(name, age) {
+    this.habit = 'shopping';
+    console.log(this.value);
+    console.log(name);
+    console.log(age);
 }
 
-var obj = {
-  name: 'pxy',
-}
+bar.prototype.friend = 'kevin';
 
-var obj1 = {
-  name: 'pxy1'
-}
+var bindFoo = bar.bind(foo, 'daisy');
 
-var name = 'zl';
-
-foo.call(obj); // pxy  调用call方法后强行将foo函数的this指向来obj对象上
-
-foo.call(obj).call(obj1); // pxy  多次调用call方法，以第一次为准
-
-foo.call(obj1).call(obj); // pxy1
-
-foo.call();// zl 没有传入指定对象，所以this默认指向全局对象
+var obj = new bindFoo('18');
+// undefined
+// daisy
+// 18
+console.log(obj.habit);
+console.log(obj.friend);
+// shopping
+// kevin
 </code></pre>
+<p>注意：尽管在全局和 foo 中都声明了 value 值，最后依然返回了 undefind，说明绑定的 this 失效了，如果了解 new 的模拟实现，就会知道这个时候的 this 已经指向了 obj。</p>
+<p>所以我们可以通过修改返回的函数的原型来实现，让我们写一下：</p>
+<pre><code class="language-js">// 第三版
+Function.prototype.bind2 = function (context) {
+    var self = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    var fBound = function () {
+        var bindArgs = Array.prototype.slice.call(arguments);
+        // 当作为构造函数时，this 指向实例，此时结果为 true，将绑定函数的 this 指向该实例，可以让实例获得来自绑定函数的值
+        // 以上面的是 demo 为例，如果改成 `this instanceof fBound ? null : context`，实例只是一个空对象，将 null 改成 this ，实例会具有 habit 属性
+        // 当作为普通函数时，this 指向 window，此时结果为 false，将绑定函数的 this 指向 context
+        return self.apply(this instanceof fBound ? this : context, args.concat(bindArgs));
+    }
+    // 修改返回函数的 prototype 为绑定函数的 prototype，实例就可以继承绑定函数的原型中的值
+    fBound.prototype = this.prototype;
+    return fBound;
+}
+
+</code></pre>
+<h2 id="构造函数效果的优化实现">构造函数效果的优化实现</h2>
+<p>但是在这个写法中，我们直接将 fBound.prototype = this.prototype，我们直接修改 fBound.prototype 的时候，也会直接修改绑定函数的 prototype。这个时候，我们可以通过一个空函数来进行中转：</p>
+<pre><code class="language-js">// 第四版
+Function.prototype.bind2 = function (context) {
+
+    var self = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    var fNOP = function () {};
+
+    var fBound = function () {
+        var bindArgs = Array.prototype.slice.call(arguments);
+        return self.apply(this instanceof fNOP ? this : context, args.concat(bindArgs));
+    }
+
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+    return fBound;
+}
+</code></pre>
+<p>到此为止，大的问题都已经解决，给自己一个赞！o(￣▽￣)ｄ</p>
+<h2 id="三个小问题">三个小问题</h2>
+<p>接下来处理些小问题:</p>
+<p><strong>1.apply 这段代码跟 MDN 上的稍有不同</strong></p>
+<p>在 MDN 中文版讲 bind 的模拟实现时，apply 这里的代码是：</p>
+<pre><code class="language-js">self.apply(this instanceof self ? this : context || this, args.concat(bindArgs))
+
+</code></pre>
+<p>多了一个关于 context 是否存在的判断，然而这个是错误的！</p>
+<p>举个例子：</p>
+<pre><code class="language-js">var value = 2;
+var foo = {
+    value: 1,
+    bar: bar.bind(null)
+};
+
+function bar() {
+    console.log(this.value);
+}
+
+foo.bar() // 2
+</code></pre>
+<p>以上代码正常情况下会打印 2，如果换成了 context || this，这段代码就会打印 1！</p>
+<p>所以这里不应该进行 context 的判断，大家查看 MDN 同样内容的英文版，就不存在这个判断！</p>
+<p><strong>2.调用 bind 的不是函数咋办？</strong></p>
+<p>报错！</p>
+<pre><code class="language-js">if (typeof this !== &quot;function&quot;) {
+  throw new Error(&quot;Function.prototype.bind - what is trying to be bound is not callable&quot;);
+}
+</code></pre>
+<p><strong>3.线上使用</strong></p>
+<p>那别忘了做个兼容：</p>
+<pre><code class="language-js">Function.prototype.bind = Function.prototype.bind || function () {
+    ……
+};
+</code></pre>
+<h2 id="最终代码">最终代码</h2>
+<p>所以最最后的代码就是：</p>
+<pre><code class="language-js">Function.prototype.bind2 = function (context) {
+
+    if (typeof this !== &quot;function&quot;) {
+      throw new Error(&quot;Function.prototype.bind - what is trying to be bound is not callable&quot;);
+    }
+
+    var self = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    var fNOP = function () {};
+
+    var fBound = function () {
+        var bindArgs = Array.prototype.slice.call(arguments);
+        return self.apply(this instanceof fNOP ? this : context, args.concat(bindArgs));
+    }
+
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+    return fBound;
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[js中call、apply实现]]></title>
+        <id>https://pxygogogo.github.io/post/js-achieve-call-apply/</id>
+        <link href="https://pxygogogo.github.io/post/js-achieve-call-apply/">
+        </link>
+        <updated>2019-12-22T12:11:27.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="实现call">实现call()</h2>
+<ul>
+<li>实现思路</li>
+</ul>
 <blockquote>
-<p>如果call、apple、bind的绑定对象是null或者undefined，那么实际上在调用时这些值都会被忽略，所以使用的是默认绑定规则</p>
+<ol>
+<li>改变this指向：可以将目标函数作为这个对象的属性</li>
+<li>利用arguments类数组对象实现参数不定长</li>
+<li>不能增加对象的属性，所以在结尾需要delete</li>
+</ol>
 </blockquote>
-<h3 id="4-通过new绑定">4、通过new绑定</h3>
-<p>构造函数在使用new后，执行的操作：</p>
+<pre><code>Function.prototype.myCall = function(context){
+    var context = context || window;   
+    context.fn = this;
+    let args = [...arguments].slice(1);
+    context.fn(...args);
+    delete context.fn;
+}
+</code></pre>
+<h2 id="实现apply">实现apply()</h2>
 <ul>
-<li>它创建（构造）了一个全新的对象</li>
-<li>它会被执行[[Prototype]]（也就是proto）链接</li>
-<li>它使this指向新创建的对象</li>
-<li>通过new创建的每个对象将最终被[[Prototype]]链接到这个函数的prototype对象上</li>
-<li>如果函数没有返回对象类型Object(包含Functoin, Array, Date, RegExg, Error)，那么new表达式中的函数调用将返回该对象引用</li>
+<li>与call（）只有一个区别，apply第二个参数为数组</li>
 </ul>
-<p>所以在使用new调用构造函数后，会构造一个新对象并将函数调用中的this绑定到新对象上。</p>
-<pre><code>var name = 'zl';
-
-function foo(name) {
-  this.name = name;
+<pre><code>Function.prototype.myApply = function(context){
+    var context = context || window;
+    contex.fn = this;
+    // 需要判断是否存储第二个参数
+    // 如果存在，就将第二个参数展开
+    if(argument[1]){
+        context.fn(...argument[1]);
+    }else{
+        context.fn();
+    }
+    
+    delete context.fn;
 }
-
-var bar = {
-  name: 'object',
-  foo1: new foo('pxy'),
-}
-
-console.log(bar.foo1.name); // pxy
 </code></pre>
-<p>构造函数是存在返回值的，可以将函数的返回值分成三种情况：</p>
-<ul>
-<li>返回一个对象</li>
-<li>没有返回值，即默认返回undefined</li>
-<li>返回基本数据类型</li>
-</ul>
-<pre><code>1、返回一个对象
-function Foo(name,age) {
-  this.name = name;
-  return {
-    age
-  }
+<h2 id="实现bind">实现bind()</h2>
+<p>返回一个与被调函数具有相同函数体的新函数，且这个新函数也能使用new操作符。</p>
+<p><strong>实现思路</strong></p>
+<blockquote>
+<ol>
+<li>返回一个新函数，可以使用闭包</li>
+<li>bind（）传入的参数长度不定，使用函数内置的arguments对象数组，可利用Array.prototype.slice.call(arguments,1 )将其转化为数组</li>
+<li>返回的新函数中，使用apply改变被调用函数的this指向，将arguments转化成的数组作为apply的第二个参数</li>
+<li>因为返回的新函数也可以使用new操作符，所以在新函数内部需要判断是否使用了new操作符（为什么需要判断，后面会讲解到），如果使用则将apply的第一个参数设置为新创建的对象，如果没有则设置为在调用bind（）时所传入的对象（不传的话默认为window）。</li>
+</ol>
+</blockquote>
+<p>需要注意的是怎么去判断是否使用了new操作符呢？在解决这个问题之前，我们先看使用new操作符时具体干了些什么，下面是new操作符的简单实现过程：</p>
+<pre><code>//简洁版的new操作符实现过程
+ 
+function newFunc(constructor){
+      //第一步：创建一个空对象obj 
+        var obj = {};
+       //第二步：将构造函数 constructor的原型对象赋给obj的原型
+        obj.__proto__ = constructor.prototype;
+      //第三步：将构造函数 constructor中的this指向obj,并立即执行构造函数内部的操作
+        constructor.apply(obj);
+      //第四步：返回这个对象
+        return obj;
 }
-
-var bar = new Foo(&quot;pxy&quot;,&quot;18&quot;);
-
-bar.name; // undefined
-
-bar.age; // 18
-
-2、没有返回值
-
-function Foo(name,age) {
-  this.name = name;
-}
-
-var bar = new Foo(&quot;pxy&quot;,&quot;18&quot;);
-
-bar.name; // pxy
-
-bar.age; // undefined
-
-3、返回基本数据类型
-
-function Foo(name,age) {
-  this.name = name;
-  return 123
-}
-
-var bar = new Foo(&quot;pxy&quot;,&quot;18&quot;);
-
-bar.name; // pxy
-
-bar.age; // undefined
-</code></pre>
-<p>所以使用new绑定时，需要判断函数返回的值是否为一个对象，如果是对象，那么this会绑定到返回的对象上。</p>
-<h2 id="5-es6箭头函数绑定">5、ES6箭头函数绑定</h2>
-<p>ES6新增了一种函数类型：箭头函数，箭头函数调用时无法使用上面四种规则了，它和普通函数最不同的一点就是对于箭头函数的this指向，是根据它外层（函数/全局）作用域来决定。</p>
-<pre><code>function foo() {
-  return (name) =&gt; {
-    console.log(this.name);
-  }
-}
-
-var obj = {
-  name: 'pxy'
-}
-
-var obj1 = {
-  name: 'text'
-}
-
-var name = 'zl';
-
-var foo1 = foo();
-foo1(); // zl
-
-var foo2 = foo.call(obj);
-foo2(); // pxy
-
-foo2.call(obj1); // pxy 可以看到，箭头函数的`this`绑定后无法被修改
-</code></pre>
-<h2 id="6-规则优先级">6、规则优先级</h2>
-<pre><code>1、new绑定
-var obj = new Foo();
-this绑定新的对象上
-
-2、显示绑定
-var obj = foo.call(bar);
-this绑定到指定对象上，若指定对象为null/undefined或着没传，则使用默认绑定规则
-
-3、隐式绑定
-var obj = bar.foo();
-this绑定到调用方法的对象上
-
-4、默认绑定
-foo();
-this在严格模式下绑定到undefined
-在非严格模式下绑定到全局对象
 </code></pre>
 ]]></content>
     </entry>
