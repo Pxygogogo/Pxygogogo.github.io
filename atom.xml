@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-25T03:08:55.118Z</updated>
+    <updated>2020-03-25T13:04:52.375Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -691,6 +691,162 @@ IdentityFile    ~/.ssh/id_rsa    #第一个步骤生成的公钥文件对应的�
 ]]></content>
     </entry>
     <entry>
+        <title type="html"><![CDATA[节流]]></title>
+        <id>https://pxygogogo.github.io/post/js-throttle/</id>
+        <link href="https://pxygogogo.github.io/post/js-throttle/">
+        </link>
+        <updated>2020-02-12T08:03:57.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="节流">节流</h2>
+<p>节流的原理很简单：</p>
+<p>如果你持续触发事件，每隔一段时间，只执行一次事件。</p>
+<p>根据首次是否执行以及结束后是否执行，效果有所不同，实现的方式也有所不同。<br>
+我们用 leading 代表首次是否执行，trailing 代表结束后是否再执行一次。</p>
+<p>关于节流的实现，有两种主流的实现方式，一种是使用时间戳，一种是设置定时器。</p>
+<h2 id="使用时间戳">使用时间戳</h2>
+<p>让我们来看第一种方法：使用时间戳，当触发事件的时候，我们取出当前的时间戳，然后减去之前的时间戳(最一开始值设为 0 )，如果大于设置的时间周期，就执行函数，然后更新时间戳为当前的时间戳，如果小于，就不执行。</p>
+<pre><code class="language-js">// 第一版
+function throttle(func, wait) {
+    var context, args;
+    var previous = 0;
+    return function() {
+        var now = +new Date();
+        context = this;
+        args = arguments;
+        if (now - previous &gt; wait) {
+            func.apply(context, args);
+            previous = now;
+        }
+    }
+}
+</code></pre>
+<h2 id="使用定时器">使用定时器</h2>
+<p>接下来，我们讲讲第二种实现方式，使用定时器。</p>
+<p>当触发事件的时候，我们设置一个定时器，再触发事件的时候，如果定时器存在，就不执行，直到定时器执行，然后执行函数，清空定时器，这样就可以设置下个定时器。</p>
+<pre><code>// 第二版
+function throttle(func, wait) {
+    var timeout;
+    var previous = 0;
+
+    return function() {
+        context = this;
+        args = arguments;
+        if (!timeout) {
+            timeout = setTimeout(function(){
+                timeout = null;
+                func.apply(context, args)
+            }, wait)
+        }
+
+    }
+}
+</code></pre>
+<p>所以比较两个方法：</p>
+<ol>
+<li>第一种事件会立刻执行，第二种事件会在 n 秒后第一次执行</li>
+<li>第一种事件停止触发后没有办法再执行事件，第二种事件停止触发后依然会再执行一次事件</li>
+</ol>
+<h2 id="双剑合璧">双剑合璧</h2>
+<p>那我们想要一个什么样的呢？</p>
+<p>有人就说了：我想要一个有头有尾的！就是鼠标移入能立刻执行，停止触发的时候还能再执行一次！</p>
+<p>所以我们综合两者的优势，然后双剑合璧，写一版代码：</p>
+<pre><code class="language-js">// 第三版
+function throttle(func, wait) {
+    var timeout, context, args, result;
+    var previous = 0;
+
+    var later = function() {
+        previous = +new Date();
+        timeout = null;
+        func.apply(context, args)
+    };
+
+    var throttled = function() {
+        var now = +new Date();
+        //下次触发 func 剩余的时间
+        var remaining = wait - (now - previous);
+        context = this;
+        args = arguments;
+         // 如果没有剩余的时间了或者你改了系统时间
+        if (remaining &lt;= 0 || remaining &gt; wait) {
+            if (timeout) {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+            previous = now;
+            func.apply(context, args);
+        } else if (!timeout) {
+            timeout = setTimeout(later, remaining);
+        }
+    };
+    return throttled;
+}
+</code></pre>
+<h2 id="优化">优化</h2>
+<p>但是我有时也希望无头有尾，或者有头无尾，这个咋办？</p>
+<p>那我们设置个 options 作为第三个参数，然后根据传的值判断到底哪种效果，我们约定:</p>
+<p>leading：false 表示禁用第一次执行<br>
+trailing: false 表示禁用停止触发的回调</p>
+<p>我们来改一下代码：</p>
+<pre><code class="language-js">// 第四版
+function throttle(func, wait, options) {
+    var timeout, context, args, result;
+    var previous = 0;
+    if (!options) options = {};
+
+    var later = function() {
+        previous = options.leading === false ? 0 : new Date().getTime();
+        timeout = null;
+        func.apply(context, args);
+        if (!timeout) context = args = null;
+    };
+
+    var throttled = function() {
+        var now = new Date().getTime();
+        if (!previous &amp;&amp; options.leading === false) previous = now;
+        var remaining = wait - (now - previous);
+        context = this;
+        args = arguments;
+        if (remaining &lt;= 0 || remaining &gt; wait) {
+            if (timeout) {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+            previous = now;
+            func.apply(context, args);
+            if (!timeout) context = args = null;
+        } else if (!timeout &amp;&amp; options.trailing !== false) {
+            timeout = setTimeout(later, remaining);
+        }
+    };
+    return throttled;
+}
+</code></pre>
+<h2 id="取消">取消</h2>
+<p>在 debounce 的实现中，我们加了一个 cancel 方法，throttle 我们也加个 cancel 方法：</p>
+<pre><code class="language-js">// 第五版 非完整代码
+...
+throttled.cancel = function() {
+    clearTimeout(timeout);
+    previous = 0;
+    timeout = null;
+}
+...
+</code></pre>
+<h2 id="注意">注意</h2>
+<p>我们要注意 underscore 的实现中有这样一个问题：</p>
+<p>那就是 <code>leading：false</code> 和 <code>trailing: false</code> 不能同时设置。</p>
+<p>如果同时设置的话，比如当你将鼠标移出的时候，因为 trailing 设置为 false，停止触发的时候不会设置定时器，所以只要再过了设置的时间，再移入的话，就会立刻执行，就违反了 leading: false，bug 就出来了，所以，这个 throttle 只有三种用法：</p>
+<pre><code class="language-js">container.onmousemove = throttle(getUserAction, 1000);
+container.onmousemove = throttle(getUserAction, 1000, {
+    leading: false
+});
+container.onmousemove = throttle(getUserAction, 1000, {
+    trailing: false
+});
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[防抖]]></title>
         <id>https://pxygogogo.github.io/post/js-debounce/</id>
         <link href="https://pxygogogo.github.io/post/js-debounce/">
@@ -1096,229 +1252,6 @@ let deepCopy = JSON.parse(JSON.stringify(obj));
     return copy
 }
 
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[js中bind实现]]></title>
-        <id>https://pxygogogo.github.io/post/js-achieve-bind/</id>
-        <link href="https://pxygogogo.github.io/post/js-achieve-bind/">
-        </link>
-        <updated>2019-12-22T12:12:50.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="bind">bind()</h2>
-<p>一句话介绍 bind:</p>
-<blockquote>
-<p>bind() 方法会创建一个新函数。当这个新函数被调用时，bind() 的第一个参数将作为它运行时的 this，之后的一序列参数将会在传递的实参前传入作为它的参数。(来自于 MDN )</p>
-</blockquote>
-<p>由此我们可以首先得出 bind 函数的两个特点：</p>
-<ol>
-<li>返回一个函数</li>
-<li>可以传入参数</li>
-</ol>
-<h2 id="返回函数的模拟实现">返回函数的模拟实现</h2>
-<p>从第一个特点开始，我们举个例子：</p>
-<pre><code class="language-js">var foo = {
-    value: 1
-};
-
-function bar() {
-    console.log(this.value);
-}
-
-// 返回了一个函数
-var bindFoo = bar.bind(foo); 
-
-bindFoo(); // 1
-</code></pre>
-<p>关于指定 this 的指向，我们可以使用 call 或者 apply 实现。我们来写第一版的代码：</p>
-<pre><code class="language-js">// 第一版
-Function.prototype.bind2 = function (context) {
-    var self = this;
-    return function () {
-        return self.apply(context);
-    }
-
-}
-</code></pre>
-<p>此外，之所以 <code>return self.apply(context)</code>，是考虑到绑定函数可能是有返回值的，依然是这个例子：</p>
-<pre><code class="language-js">var foo = {
-    value: 1
-};
-
-function bar() {
-    return this.value;
-}
-
-var bindFoo = bar.bind(foo);
-
-console.log(bindFoo()); // 1
-</code></pre>
-<h2 id="传参的模拟实现">传参的模拟实现</h2>
-<p>接下来看第二点，可以传入参数。这个就有点让人费解了，我在 bind 的时候，是否可以传参呢？我在执行 bind 返回的函数的时候，可不可以传参呢？让我们看个例子：</p>
-<pre><code class="language-js">var foo = {
-    value: 1
-};
-
-function bar(name, age) {
-    console.log(this.value);
-    console.log(name);
-    console.log(age);
-
-}
-
-var bindFoo = bar.bind(foo, 'daisy');
-bindFoo('18');
-// 1
-// daisy
-// 18
-</code></pre>
-<p>函数需要传 name 和 age 两个参数，竟然还可以在 bind 的时候，只传一个 name，在执行返回的函数的时候，再传另一个参数 age!</p>
-<p>这可咋办？不急，我们用 arguments 进行处理：</p>
-<pre><code class="language-js">// 第二版
-Function.prototype.bind2 = function (context) {
-
-    var self = this;
-    // 获取bind2函数从第二个参数到最后一个参数
-    var args = Array.prototype.slice.call(arguments, 1);
-
-    return function () {
-        // 这个时候的arguments是指bind返回的函数传入的参数
-        var bindArgs = Array.prototype.slice.call(arguments);
-        return self.apply(context, args.concat(bindArgs));
-    }
-
-}
-</code></pre>
-<h2 id="构造函数效果的模拟实现">构造函数效果的模拟实现</h2>
-<p>完成了这两点，最难的部分到啦！因为 bind 还有一个特点，就是</p>
-<blockquote>
-<p>一个绑定函数也能使用new操作符创建对象：这种行为就像把原函数当成构造器。提供的 this 值被忽略，同时调用时的参数被提供给模拟函数。</p>
-</blockquote>
-<p>也就是说当 bind 返回的函数作为构造函数的时候，bind 时指定的 this 值会失效，但传入的参数依然生效。举个例子：</p>
-<pre><code class="language-js">var value = 2;
-
-var foo = {
-    value: 1
-};
-
-function bar(name, age) {
-    this.habit = 'shopping';
-    console.log(this.value);
-    console.log(name);
-    console.log(age);
-}
-
-bar.prototype.friend = 'kevin';
-
-var bindFoo = bar.bind(foo, 'daisy');
-
-var obj = new bindFoo('18');
-// undefined
-// daisy
-// 18
-console.log(obj.habit);
-console.log(obj.friend);
-// shopping
-// kevin
-</code></pre>
-<p>注意：尽管在全局和 foo 中都声明了 value 值，最后依然返回了 undefind，说明绑定的 this 失效了，如果了解 new 的模拟实现，就会知道这个时候的 this 已经指向了 obj。</p>
-<p>所以我们可以通过修改返回的函数的原型来实现，让我们写一下：</p>
-<pre><code class="language-js">// 第三版
-Function.prototype.bind2 = function (context) {
-    var self = this;
-    var args = Array.prototype.slice.call(arguments, 1);
-
-    var fBound = function () {
-        var bindArgs = Array.prototype.slice.call(arguments);
-        // 当作为构造函数时，this 指向实例，此时结果为 true，将绑定函数的 this 指向该实例，可以让实例获得来自绑定函数的值
-        // 以上面的是 demo 为例，如果改成 `this instanceof fBound ? null : context`，实例只是一个空对象，将 null 改成 this ，实例会具有 habit 属性
-        // 当作为普通函数时，this 指向 window，此时结果为 false，将绑定函数的 this 指向 context
-        return self.apply(this instanceof fBound ? this : context, args.concat(bindArgs));
-    }
-    // 修改返回函数的 prototype 为绑定函数的 prototype，实例就可以继承绑定函数的原型中的值
-    fBound.prototype = this.prototype;
-    return fBound;
-}
-
-</code></pre>
-<h2 id="构造函数效果的优化实现">构造函数效果的优化实现</h2>
-<p>但是在这个写法中，我们直接将 fBound.prototype = this.prototype，我们直接修改 fBound.prototype 的时候，也会直接修改绑定函数的 prototype。这个时候，我们可以通过一个空函数来进行中转：</p>
-<pre><code class="language-js">// 第四版
-Function.prototype.bind2 = function (context) {
-
-    var self = this;
-    var args = Array.prototype.slice.call(arguments, 1);
-
-    var fNOP = function () {};
-
-    var fBound = function () {
-        var bindArgs = Array.prototype.slice.call(arguments);
-        return self.apply(this instanceof fNOP ? this : context, args.concat(bindArgs));
-    }
-
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
-    return fBound;
-}
-</code></pre>
-<p>到此为止，大的问题都已经解决，给自己一个赞！o(￣▽￣)ｄ</p>
-<h2 id="三个小问题">三个小问题</h2>
-<p>接下来处理些小问题:</p>
-<p><strong>1.apply 这段代码跟 MDN 上的稍有不同</strong></p>
-<p>在 MDN 中文版讲 bind 的模拟实现时，apply 这里的代码是：</p>
-<pre><code class="language-js">self.apply(this instanceof self ? this : context || this, args.concat(bindArgs))
-
-</code></pre>
-<p>多了一个关于 context 是否存在的判断，然而这个是错误的！</p>
-<p>举个例子：</p>
-<pre><code class="language-js">var value = 2;
-var foo = {
-    value: 1,
-    bar: bar.bind(null)
-};
-
-function bar() {
-    console.log(this.value);
-}
-
-foo.bar() // 2
-</code></pre>
-<p>以上代码正常情况下会打印 2，如果换成了 context || this，这段代码就会打印 1！</p>
-<p>所以这里不应该进行 context 的判断，大家查看 MDN 同样内容的英文版，就不存在这个判断！</p>
-<p><strong>2.调用 bind 的不是函数咋办？</strong></p>
-<p>报错！</p>
-<pre><code class="language-js">if (typeof this !== &quot;function&quot;) {
-  throw new Error(&quot;Function.prototype.bind - what is trying to be bound is not callable&quot;);
-}
-</code></pre>
-<p><strong>3.线上使用</strong></p>
-<p>那别忘了做个兼容：</p>
-<pre><code class="language-js">Function.prototype.bind = Function.prototype.bind || function () {
-    ……
-};
-</code></pre>
-<h2 id="最终代码">最终代码</h2>
-<p>所以最最后的代码就是：</p>
-<pre><code class="language-js">Function.prototype.bind2 = function (context) {
-
-    if (typeof this !== &quot;function&quot;) {
-      throw new Error(&quot;Function.prototype.bind - what is trying to be bound is not callable&quot;);
-    }
-
-    var self = this;
-    var args = Array.prototype.slice.call(arguments, 1);
-
-    var fNOP = function () {};
-
-    var fBound = function () {
-        var bindArgs = Array.prototype.slice.call(arguments);
-        return self.apply(this instanceof fNOP ? this : context, args.concat(bindArgs));
-    }
-
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
-    return fBound;
-}
 </code></pre>
 ]]></content>
     </entry>
