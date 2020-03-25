@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-24T12:50:33.287Z</updated>
+    <updated>2020-03-25T03:08:55.118Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -691,6 +691,191 @@ IdentityFile    ~/.ssh/id_rsa    #第一个步骤生成的公钥文件对应的�
 ]]></content>
     </entry>
     <entry>
+        <title type="html"><![CDATA[防抖]]></title>
+        <id>https://pxygogogo.github.io/post/js-debounce/</id>
+        <link href="https://pxygogogo.github.io/post/js-debounce/">
+        </link>
+        <updated>2020-02-12T02:48:21.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>在前端开发中会遇到一些频繁的事件触发，比如：</p>
+<ol>
+<li>window 的 resize、scroll</li>
+<li>mousedown、mousemove</li>
+<li>keyup、keydown<br>
+......</li>
+</ol>
+<h2 id="引例">引例</h2>
+<p>index.html文件如下</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;meta http-equiv=&quot;x-ua-compatible&quot; content=&quot;IE=edge, chrome=1&quot;&gt;
+    &lt;title&gt;debounce&lt;/title&gt;
+    &lt;style&gt;
+        #container{
+            width: 100%; height: 200px; line-height: 200px; text-align: center; color: #fff; background-color: #444; font-size: 30px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div id=&quot;container&quot;&gt;&lt;/div&gt;
+    &lt;script&gt;
+        var count = 1;
+        var container = document.getElementById('container');
+    
+        function getUserAction() {
+            container.innerHTML = count++;
+        };
+    
+        container.onmousemove = getUserAction;
+    &lt;/script&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+<p>效果如下：<br>
+<img src="https://i.loli.net/2020/03/25/U3I84RAEVWqksZN.gif" alt="演示效果" loading="lazy"></p>
+<p>从左边滑到右边就触发了 129 次 getUserAction 函数！</p>
+<p>因为这个例子很简单，所以浏览器完全反应的过来，可是如果是复杂的回调函数或是 ajax 请求呢？假设 1 秒触发了 60 次，每个回调就必须在 1000 / 60 = 16.67ms 内完成，否则就会有卡顿出现。</p>
+<p>为了解决这个问题，一般有两种解决方案：</p>
+<ol>
+<li>debounce 防抖</li>
+<li>throttle 节流</li>
+</ol>
+<p>下面重点介绍防抖的实现。</p>
+<h2 id="防抖">防抖</h2>
+<p>防抖的原理就是：你尽管触发事件，但是我一定在事件停止触发 n 秒后才执行。</p>
+<p>这意味着如果你在一个事件触发的 n 秒内又触发了这个事件，那我就以新的事件触发的时间为准，在此时间 n 秒后才执行。</p>
+<p>总之，就是要等你触发完事件 n 秒内不再触发事件，我才执行!</p>
+<h2 id="第一版">第一版</h2>
+<p>根据这段表述，我们可以轻松写出第一版的代码：</p>
+<pre><code class="language-js">//第一版
+function debounce(func,wait){
+    var timeout;
+    return function(){
+        clearTimeout(timeout);
+        timeout = setTimeOut(func,wait)
+    }
+}
+</code></pre>
+<p>如果我们要使用它，以最一开始的例子为例：</p>
+<pre><code class="language-js">container.onmousemove = debounce(getUserAction, 1000);
+</code></pre>
+<p>现在随你怎么移动，反正你移动完 1000ms 内不再触发，我才执行事件。</p>
+<h2 id="this">this</h2>
+<p>如果我们在 <code>getUserAction</code> 函数中 <code>console.log(this)</code>，在不使用 <code>debounce</code> 函数的时候，<code>this</code> 的值为：</p>
+<pre><code class="language-html">&lt;div id=&quot;container&quot;&gt;&lt;/div&gt;
+</code></pre>
+<p>但是如果使用我们的 debounce 函数，this 就会指向 Window 对象！</p>
+<p>所以我们需要将 this 指向正确的对象。</p>
+<p>我们修改下代码：</p>
+<pre><code class="language-js">//第二版
+function debounce(func,wait){
+    var timeout;
+    return function(){
+        var context = this;
+        clearTimeout(timeout);
+        timeout = setTimeOut(function(){
+            func.apply(context)
+        },wait)
+    }
+}
+</code></pre>
+<p>现在 this 已经可以正确指向了。让我们看下个问题：</p>
+<h2 id="event-对象">event 对象</h2>
+<p>JavaScript 在事件处理函数中会提供事件对象 event，我们修改下 getUserAction 函数：</p>
+<pre><code class="language-js">function getUserAction(e) {
+    console.log(e);
+    container.innerHTML = count++;
+};
+</code></pre>
+<p>如果我们不使用 debouce 函数，这里会打印 MouseEvent 对象</p>
+<p>但是在我们实现的 debounce 函数中，却只会打印 undefined!</p>
+<p>所以我们再修改一下代码：</p>
+<pre><code class="language-js">//第三版
+function debounce(func.wait){
+    var timeout;
+    return function(){
+        var context = this;
+        vat args = arguments;
+        clearTimeOut(timeout);
+        timeout = setTimeOut(function(){
+            func.apply(context,args)
+        },wait)
+    }
+}
+</code></pre>
+<p>到此为止，我们修复了两个小问题：</p>
+<ol>
+<li>this 指向</li>
+<li>event 对象</li>
+</ol>
+<h2 id="立刻执行">立刻执行</h2>
+<p>这个时候，代码已经很是完善了，但是为了让这个函数更加完善，我们接下来思考一个新的需求。</p>
+<p>这个需求就是：</p>
+<p>我不希望非要等到事件停止触发后才执行，我希望立刻执行函数，然后等到停止触发 n 秒后，才可以重新触发执行。</p>
+<p>想想这个需求也是很有道理的嘛，那我们加个 immediate 参数判断是否是立刻执行。</p>
+<pre><code class="language-js">// 第四版
+function debounce(func, wait, immediate) {
+
+    var timeout;
+
+    return function () {
+        var context = this;
+        var args = arguments;
+
+        if (timeout) clearTimeout(timeout);
+        if (immediate) {
+            // 如果已经执行过，不再执行
+            var callNow = !timeout;
+            timeout = setTimeout(function(){
+                timeout = null;
+            }, wait)
+            if (callNow) func.apply(context, args)
+        }
+        else {
+            timeout = setTimeout(function(){
+                func.apply(context, args)
+            }, wait);
+        }
+    }
+}
+</code></pre>
+<h2 id="返回值">返回值</h2>
+<p>此时注意一点，就是 getUserAction 函数可能是有返回值的，所以我们也要返回函数的执行结果，但是当 immediate 为 false 的时候，因为使用了 setTimeout ，我们将 func.apply(context, args) 的返回值赋给变量，最后再 return 的时候，值将会一直是 undefined，所以我们只在 immediate 为 true 的时候返回函数的执行结果。</p>
+<pre><code class="language-js">// 第五版
+function debounce(func, wait, immediate) {
+
+    var timeout, result;
+
+    return function () {
+        var context = this;
+        var args = arguments;
+
+        if (timeout) clearTimeout(timeout);
+        if (immediate) {
+            // 如果已经执行过，不再执行
+            var callNow = !timeout;
+            timeout = setTimeout(function(){
+                timeout = null;
+            }, wait)
+            if (callNow) result = func.apply(context, args)
+        }
+        else {
+            timeout = setTimeout(function(){
+                func.apply(context, args)
+            }, wait);
+        }
+        return result;
+    }
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[js for in 和 for of 区别及遍历相关注意点]]></title>
         <id>https://pxygogogo.github.io/post/js-iterator/</id>
         <link href="https://pxygogogo.github.io/post/js-iterator/">
@@ -1133,76 +1318,6 @@ foo.bar() // 2
     fNOP.prototype = this.prototype;
     fBound.prototype = new fNOP();
     return fBound;
-}
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[js中call、apply实现]]></title>
-        <id>https://pxygogogo.github.io/post/js-achieve-call-apply/</id>
-        <link href="https://pxygogogo.github.io/post/js-achieve-call-apply/">
-        </link>
-        <updated>2019-12-22T12:11:27.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="实现call">实现call()</h2>
-<ul>
-<li>实现思路</li>
-</ul>
-<blockquote>
-<ol>
-<li>改变this指向：可以将目标函数作为这个对象的属性</li>
-<li>利用arguments类数组对象实现参数不定长</li>
-<li>不能增加对象的属性，所以在结尾需要delete</li>
-</ol>
-</blockquote>
-<pre><code>Function.prototype.myCall = function(context){
-    var context = context || window;   
-    context.fn = this;
-    let args = [...arguments].slice(1);
-    context.fn(...args);
-    delete context.fn;
-}
-</code></pre>
-<h2 id="实现apply">实现apply()</h2>
-<ul>
-<li>与call（）只有一个区别，apply第二个参数为数组</li>
-</ul>
-<pre><code>Function.prototype.myApply = function(context){
-    var context = context || window;
-    contex.fn = this;
-    // 需要判断是否存储第二个参数
-    // 如果存在，就将第二个参数展开
-    if(argument[1]){
-        context.fn(...argument[1]);
-    }else{
-        context.fn();
-    }
-    
-    delete context.fn;
-}
-</code></pre>
-<h2 id="实现bind">实现bind()</h2>
-<p>返回一个与被调函数具有相同函数体的新函数，且这个新函数也能使用new操作符。</p>
-<p><strong>实现思路</strong></p>
-<blockquote>
-<ol>
-<li>返回一个新函数，可以使用闭包</li>
-<li>bind（）传入的参数长度不定，使用函数内置的arguments对象数组，可利用Array.prototype.slice.call(arguments,1 )将其转化为数组</li>
-<li>返回的新函数中，使用apply改变被调用函数的this指向，将arguments转化成的数组作为apply的第二个参数</li>
-<li>因为返回的新函数也可以使用new操作符，所以在新函数内部需要判断是否使用了new操作符（为什么需要判断，后面会讲解到），如果使用则将apply的第一个参数设置为新创建的对象，如果没有则设置为在调用bind（）时所传入的对象（不传的话默认为window）。</li>
-</ol>
-</blockquote>
-<p>需要注意的是怎么去判断是否使用了new操作符呢？在解决这个问题之前，我们先看使用new操作符时具体干了些什么，下面是new操作符的简单实现过程：</p>
-<pre><code>//简洁版的new操作符实现过程
- 
-function newFunc(constructor){
-      //第一步：创建一个空对象obj 
-        var obj = {};
-       //第二步：将构造函数 constructor的原型对象赋给obj的原型
-        obj.__proto__ = constructor.prototype;
-      //第三步：将构造函数 constructor中的this指向obj,并立即执行构造函数内部的操作
-        constructor.apply(obj);
-      //第四步：返回这个对象
-        return obj;
 }
 </code></pre>
 ]]></content>

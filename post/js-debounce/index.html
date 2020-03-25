@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>防抖 | 小潘的博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://pxygogogo.github.io/favicon.ico?v=1585104576749">
+<link rel="stylesheet" href="https://pxygogogo.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="前言
+在前端开发中会遇到一些频繁的事件触发，比如：
+
+window 的 resize、scroll
+mousedown、mousemove
+keyup、keydown
+......
+
+引例
+index.html文件如下
+&lt;!DOCTY..." />
+    <meta name="keywords" content="js" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://pxygogogo.github.io">
+        <img src="https://pxygogogo.github.io/images/avatar.png?v=1585104576749" class="site-logo">
+        <h1 class="site-title">小潘的博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      平凡的世界
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://pxygogogo.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">防抖</h2>
+            <div class="post-date">2020-02-12</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="前言">前言</h2>
+<p>在前端开发中会遇到一些频繁的事件触发，比如：</p>
+<ol>
+<li>window 的 resize、scroll</li>
+<li>mousedown、mousemove</li>
+<li>keyup、keydown<br>
+......</li>
+</ol>
+<h2 id="引例">引例</h2>
+<p>index.html文件如下</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;
+
+&lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;meta http-equiv=&quot;x-ua-compatible&quot; content=&quot;IE=edge, chrome=1&quot;&gt;
+    &lt;title&gt;debounce&lt;/title&gt;
+    &lt;style&gt;
+        #container{
+            width: 100%; height: 200px; line-height: 200px; text-align: center; color: #fff; background-color: #444; font-size: 30px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+    &lt;div id=&quot;container&quot;&gt;&lt;/div&gt;
+    &lt;script&gt;
+        var count = 1;
+        var container = document.getElementById('container');
+    
+        function getUserAction() {
+            container.innerHTML = count++;
+        };
+    
+        container.onmousemove = getUserAction;
+    &lt;/script&gt;
+&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+<p>效果如下：<br>
+<img src="https://i.loli.net/2020/03/25/U3I84RAEVWqksZN.gif" alt="演示效果" loading="lazy"></p>
+<p>从左边滑到右边就触发了 129 次 getUserAction 函数！</p>
+<p>因为这个例子很简单，所以浏览器完全反应的过来，可是如果是复杂的回调函数或是 ajax 请求呢？假设 1 秒触发了 60 次，每个回调就必须在 1000 / 60 = 16.67ms 内完成，否则就会有卡顿出现。</p>
+<p>为了解决这个问题，一般有两种解决方案：</p>
+<ol>
+<li>debounce 防抖</li>
+<li>throttle 节流</li>
+</ol>
+<p>下面重点介绍防抖的实现。</p>
+<h2 id="防抖">防抖</h2>
+<p>防抖的原理就是：你尽管触发事件，但是我一定在事件停止触发 n 秒后才执行。</p>
+<p>这意味着如果你在一个事件触发的 n 秒内又触发了这个事件，那我就以新的事件触发的时间为准，在此时间 n 秒后才执行。</p>
+<p>总之，就是要等你触发完事件 n 秒内不再触发事件，我才执行!</p>
+<h2 id="第一版">第一版</h2>
+<p>根据这段表述，我们可以轻松写出第一版的代码：</p>
+<pre><code class="language-js">//第一版
+function debounce(func,wait){
+    var timeout;
+    return function(){
+        clearTimeout(timeout);
+        timeout = setTimeOut(func,wait)
+    }
+}
+</code></pre>
+<p>如果我们要使用它，以最一开始的例子为例：</p>
+<pre><code class="language-js">container.onmousemove = debounce(getUserAction, 1000);
+</code></pre>
+<p>现在随你怎么移动，反正你移动完 1000ms 内不再触发，我才执行事件。</p>
+<h2 id="this">this</h2>
+<p>如果我们在 <code>getUserAction</code> 函数中 <code>console.log(this)</code>，在不使用 <code>debounce</code> 函数的时候，<code>this</code> 的值为：</p>
+<pre><code class="language-html">&lt;div id=&quot;container&quot;&gt;&lt;/div&gt;
+</code></pre>
+<p>但是如果使用我们的 debounce 函数，this 就会指向 Window 对象！</p>
+<p>所以我们需要将 this 指向正确的对象。</p>
+<p>我们修改下代码：</p>
+<pre><code class="language-js">//第二版
+function debounce(func,wait){
+    var timeout;
+    return function(){
+        var context = this;
+        clearTimeout(timeout);
+        timeout = setTimeOut(function(){
+            func.apply(context)
+        },wait)
+    }
+}
+</code></pre>
+<p>现在 this 已经可以正确指向了。让我们看下个问题：</p>
+<h2 id="event-对象">event 对象</h2>
+<p>JavaScript 在事件处理函数中会提供事件对象 event，我们修改下 getUserAction 函数：</p>
+<pre><code class="language-js">function getUserAction(e) {
+    console.log(e);
+    container.innerHTML = count++;
+};
+</code></pre>
+<p>如果我们不使用 debouce 函数，这里会打印 MouseEvent 对象</p>
+<p>但是在我们实现的 debounce 函数中，却只会打印 undefined!</p>
+<p>所以我们再修改一下代码：</p>
+<pre><code class="language-js">//第三版
+function debounce(func.wait){
+    var timeout;
+    return function(){
+        var context = this;
+        vat args = arguments;
+        clearTimeOut(timeout);
+        timeout = setTimeOut(function(){
+            func.apply(context,args)
+        },wait)
+    }
+}
+</code></pre>
+<p>到此为止，我们修复了两个小问题：</p>
+<ol>
+<li>this 指向</li>
+<li>event 对象</li>
+</ol>
+<h2 id="立刻执行">立刻执行</h2>
+<p>这个时候，代码已经很是完善了，但是为了让这个函数更加完善，我们接下来思考一个新的需求。</p>
+<p>这个需求就是：</p>
+<p>我不希望非要等到事件停止触发后才执行，我希望立刻执行函数，然后等到停止触发 n 秒后，才可以重新触发执行。</p>
+<p>想想这个需求也是很有道理的嘛，那我们加个 immediate 参数判断是否是立刻执行。</p>
+<pre><code class="language-js">// 第四版
+function debounce(func, wait, immediate) {
+
+    var timeout;
+
+    return function () {
+        var context = this;
+        var args = arguments;
+
+        if (timeout) clearTimeout(timeout);
+        if (immediate) {
+            // 如果已经执行过，不再执行
+            var callNow = !timeout;
+            timeout = setTimeout(function(){
+                timeout = null;
+            }, wait)
+            if (callNow) func.apply(context, args)
+        }
+        else {
+            timeout = setTimeout(function(){
+                func.apply(context, args)
+            }, wait);
+        }
+    }
+}
+</code></pre>
+<h2 id="返回值">返回值</h2>
+<p>此时注意一点，就是 getUserAction 函数可能是有返回值的，所以我们也要返回函数的执行结果，但是当 immediate 为 false 的时候，因为使用了 setTimeout ，我们将 func.apply(context, args) 的返回值赋给变量，最后再 return 的时候，值将会一直是 undefined，所以我们只在 immediate 为 true 的时候返回函数的执行结果。</p>
+<pre><code class="language-js">// 第五版
+function debounce(func, wait, immediate) {
+
+    var timeout, result;
+
+    return function () {
+        var context = this;
+        var args = arguments;
+
+        if (timeout) clearTimeout(timeout);
+        if (immediate) {
+            // 如果已经执行过，不再执行
+            var callNow = !timeout;
+            timeout = setTimeout(function(){
+                timeout = null;
+            }, wait)
+            if (callNow) result = func.apply(context, args)
+        }
+        else {
+            timeout = setTimeout(function(){
+                func.apply(context, args)
+            }, wait);
+        }
+        return result;
+    }
+}
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://pxygogogo.github.io/tag/js/" class="tag">
+                    js
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://pxygogogo.github.io/post/js-iterator/">
+                  <h3 class="post-title">
+                    js for in 和 for of 区别及遍历相关注意点
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
