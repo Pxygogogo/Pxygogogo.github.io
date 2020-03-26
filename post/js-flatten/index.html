@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>微信小程序页面跳转的一系列注意点 | 小潘的博客</title>
+<title>数组扁平化 | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,19 +18,11 @@
 
 
 
-    <meta name="description" content="
-
-showModel 回调无法跳转除TabBar之外的页面
-
-回调中只能使用switchTab进行跳转
-
-
-
-switchTab跳转后页面不刷新
-
-
-法一：switchTab成功跳转后调用success,此时可以拿到跳转后页面的page对..." />
-    <meta name="keywords" content="微信小程序" />
+    <meta name="description" content="扁平化
+数组的扁平化，就是将一个嵌套多层的数组 array (嵌套可以是任何层数)转换为只有一层的数组。
+举个例子，假设有个名为 flatten 的函数可以做到数组扁平化，效果就会如下：
+var arr = [1, [2, [3, 4]]]..." />
+    <meta name="keywords" content="js" />
   </head>
   <body>
     <div id="app" class="main">
@@ -101,55 +93,70 @@ switchTab跳转后页面不刷新
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">微信小程序页面跳转的一系列注意点</h2>
-            <div class="post-date">2020-02-13</div>
+            <h2 class="post-title">数组扁平化</h2>
+            <div class="post-date">2020-02-14</div>
             
             <div class="post-content" v-pre>
-              <ol>
-<li>
-<p>showModel 回调无法跳转除TabBar之外的页面</p>
-<ul>
-<li>回调中只能使用switchTab进行跳转</li>
-</ul>
-</li>
-<li>
-<p>switchTab跳转后页面不刷新</p>
-<ul>
-<li>
-<p>法一：switchTab成功跳转后调用success,此时可以拿到跳转后页面的page对象,从而调用页面onLoad方法重载页面</p>
-<pre><code class="language-javascript">wx.switchTab({
-    url: '/pages/index/index',
-    success: function(e) {
-        let page = getCurrentPages().pop();
-        if (page == undefined || page == null) return;
-        page.onLoad();
+              <h2 id="扁平化">扁平化</h2>
+<p>数组的扁平化，就是将一个嵌套多层的数组 array (嵌套可以是任何层数)转换为只有一层的数组。</p>
+<p>举个例子，假设有个名为 flatten 的函数可以做到数组扁平化，效果就会如下：</p>
+<pre><code class="language-js">var arr = [1, [2, [3, 4]]];
+console.log(flatten(arr)) // [1, 2, 3, 4]
+</code></pre>
+<p>知道了效果是什么样的了，我们可以去尝试着写这个 flatten 函数了</p>
+<h2 id="递归">递归</h2>
+<p>我们最一开始能想到的莫过于循环数组元素，如果还是一个数组，就递归调用该方法：</p>
+<pre><code class="language-js">// 方法 1
+var arr = [1, [2, [3, 4]]];
+
+function flatten(arr) {
+    var result = [];
+    for (var i = 0,  i &lt; arr.length; i++) {
+        if (Array.isArray(arr[i])) {
+            result = result.concat(flatten(arr[i]))
+        }
+        else {
+            result.push(arr[i])
+        }
     }
-})
+    return result;
+}
+
+
+console.log(flatten(arr))
 </code></pre>
-</li>
-<li>
-<p>法二：当switchTab点击过的时候，只有第一次加载数据，第二次点击的时候是不刷新数据的，这个时候只要在需要每次点击都需要刷新数据的TabBar页的js里加上onShow的方法即可</p>
-<pre><code class="language-javascript"> onShow:function(e){
-       this.onLoad();
- },
+<h2 id="tostring">toString</h2>
+<p>如果数组的元素都是数字，那么我们可以考虑使用 toString 方法，因为：</p>
+<pre><code class="language-js">[1, [2, [3, 4]]].toString() // &quot;1,2,3,4&quot;
 </code></pre>
-</li>
-</ul>
-</li>
-<li>
-<p>TabBar页面只能使用switchTab跳转</p>
-<ul>
-<li>文档里有写，使用时需注意</li>
-</ul>
-</li>
-</ol>
+<p>调用 toString 方法，返回了一个逗号分隔的扁平的字符串，这时候我们再 split，然后转成数字不就可以实现扁平化了吗？</p>
+<pre><code class="language-js">// 方法2
+var arr = [1, [2, [3, 4]]];
+
+function flatten(arr) {
+    return arr.toString().split(',').map(function(item){
+        return +item
+    })
+}
+
+console.log(flatten(arr))
+</code></pre>
+<p>然而这种方法使用的场景却非常有限，如果数组是 [1, '1', 2, '2'] 的话，这种方法就会产生错误的结果。</p>
+<h2 id="reduce">reduce</h2>
+<p>既然是对数组进行处理，最终返回一个值，我们就可以考虑使用 reduce 来简化代码：</p>
+<pre><code class="language-js">function flatten(arr){
+    return arr.reduce((acc,cur)=&gt;{
+        return Array.isArray(acc) ? flatten(acc) : cur;
+    },[])
+}
+</code></pre>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://pxygogogo.github.io/tag/wechatmini/" class="tag">
-                    微信小程序
+                  <a href="https://pxygogogo.github.io/tag/js/" class="tag">
+                    js
                   </a>
                 
               </div>
@@ -157,9 +164,9 @@ switchTab跳转后页面不刷新
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://pxygogogo.github.io/post/js-unique-arr/">
+                <a href="https://pxygogogo.github.io/post/nagivation-problems/">
                   <h3 class="post-title">
-                    js数组去重
+                    微信小程序页面跳转的一系列注意点
                   </h3>
                 </a>
               </div>
