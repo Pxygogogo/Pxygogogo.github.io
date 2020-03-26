@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-25T13:07:20.036Z</updated>
+    <updated>2020-03-26T02:34:35.339Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -691,6 +691,126 @@ IdentityFile    ~/.ssh/id_rsa    #第一个步骤生成的公钥文件对应的�
 ]]></content>
     </entry>
     <entry>
+        <title type="html"><![CDATA[js数组去重]]></title>
+        <id>https://pxygogogo.github.io/post/js-unique-arr/</id>
+        <link href="https://pxygogogo.github.io/post/js-unique-arr/">
+        </link>
+        <updated>2020-02-13T02:26:31.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="一-利用es6-set去重es6中最常用">一、利用ES6 Set去重（ES6中最常用）</h2>
+<pre><code class="language-js">function unique (arr) {
+  return Array.from(new Set(arr))
+}
+</code></pre>
+<p>甚至可以再简化下：</p>
+<pre><code class="language-js">function unique(array) {
+    return [...new Set(array)];
+}
+</code></pre>
+<p>还可以再简化下：</p>
+<pre><code class="language-js">var unique = (a) =&gt; [...new Set(a)]
+</code></pre>
+<p>此外，如果用 Map 的话：</p>
+<pre><code class="language-js">function unique (arr) {
+    const seen = new Map()
+    return arr.filter((a) =&gt; !seen.has(a) &amp;&amp; seen.set(a, 1))
+}
+</code></pre>
+<h2 id="二-利用for嵌套for然后splice去重es5中最常用">二、利用for嵌套for，然后splice去重（ES5中最常用）</h2>
+<pre><code class="language-js">function unique(arr){
+    for(let i = 0 ; i &lt; arr.length ; i++){
+        for(let j = i+1 ; j &lt; arr.length ; j++){
+            if(arr[i] === arr[j]){
+                arr.splice(j,1);
+                j--;
+            }
+        }
+    }
+    return arr;
+}
+</code></pre>
+<p>双层循环，外层循环元素，内层循环时比较值。值相同时，则删去这个值。</p>
+<h2 id="三-利用indexof去重">三、利用indexOf去重</h2>
+<pre><code class="language-js">function unique(arr){
+    if(!Array.isArray(arr)){
+        throw Error('wrong type,Array required')
+    }
+    let res = [];
+    for (let i = 0; i &lt; arr.length; i++) {
+        if(res.indexOf(arr[i])===-1){
+            res.push(arr[i])
+        }
+    }
+    return res;
+}
+</code></pre>
+<p>新建一个空的结果数组，for 循环原数组，判断结果数组是否存在当前元素，如果有相同的值则跳过，不相同则push进数组。</p>
+<h2 id="四-利用sort">四、利用sort()</h2>
+<pre><code class="language-js">function unique(arr){
+    if(!Array.isArray(arr)){
+        throw Error('wrong type,Array required')
+    }
+    arr = arr.sort();
+    let res = [arr[0]];
+    for (let i = 1; i &lt; arr.length ; i++) {
+        if(arr[i]!==arr[i-1]){
+            res.push(arr[i])
+        }
+    }
+    return res;
+}
+</code></pre>
+<p>利用sort()排序方法，然后根据排序后的结果进行遍历及相邻元素比对。</p>
+<h2 id="五-object-键值对">五、Object 键值对</h2>
+<p>这种方法是利用一个空的 Object 对象，我们把数组的值存成 Object 的 key 值，比如 Object[value1] = true，在判断另一个值的时候，如果 Object[value2]存在的话，就说明该值是重复的。示例代码如下：</p>
+<pre><code class="language-js">var array = [1, 2, 1, 1, '1'];
+
+function unique(array) {
+    var obj = {};
+    return array.filter(function(item, index, array){
+        return obj.hasOwnProperty(item) ? false : (obj[item] = true)
+    })
+}
+
+console.log(unique(array)); // [1, 2]
+</code></pre>
+<p>我们可以发现，是有问题的，因为 1 和 '1' 是不同的，但是这种方法会判断为同一个值，这是因为对象的键值只能是字符串，所以我们可以使用 <code>typeof item + item</code> 拼成字符串作为 key 值来避免这个问题：</p>
+<pre><code class="language-js">var array = [1, 2, 1, 1, '1'];
+
+function unique(array) {
+    var obj = {};
+    return array.filter(function(item, index, array){
+        return obj.hasOwnProperty(typeof item + item) ? false : (obj[typeof item + item] = true)
+    })
+}
+
+console.log(unique(array)); // [1, 2, &quot;1&quot;]
+</code></pre>
+<p>然而，即便如此，我们依然无法正确区分出两个对象，比如 {value: 1} 和 {value: 2}，因为 <code>typeof item + item</code> 的结果都会是 <code>object[object Object]</code>，不过我们可以使用 JSON.stringify 将对象序列化：</p>
+<pre><code class="language-js">var array = [{value: 1}, {value: 1}, {value: 2}];
+
+function unique(array) {
+    var obj = {};
+    return array.filter(function(item, index, array){
+        console.log(typeof item + JSON.stringify(item))
+        return obj.hasOwnProperty(typeof item + JSON.stringify(item)) ? false : (obj[typeof item + JSON.stringify(item)] = true)
+    })
+}
+
+console.log(unique(array)); // [{value: 1}, {value: 2}]
+</code></pre>
+<h2 id="六-filter">六、filter</h2>
+<p>ES5 提供了 filter 方法，我们可以用来简化外层循环：</p>
+<p>比如使用 indexOf 的方法：</p>
+<pre><code class="language-js">function unique(arr) {
+  return arr.filter(function(item, index, arr) {
+    //当前元素，在原始数组中的第一个索引==当前索引值，否则返回当前元素
+    return arr.indexOf(item, 0) === index;
+  });
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[节流]]></title>
         <id>https://pxygogogo.github.io/post/js-throttle/</id>
         <link href="https://pxygogogo.github.io/post/js-throttle/">
@@ -1212,47 +1332,6 @@ for-of循环首先调用集合的Symbol.iterator方法，紧接着返回一个�
 https://www.jianshu.com/p/c43f418d6bf0<br>
 https://www.cnblogs.com/owenzh/p/11058708.html</p>
 </blockquote>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[js实现深浅拷贝]]></title>
-        <id>https://pxygogogo.github.io/post/js-copy/</id>
-        <link href="https://pxygogogo.github.io/post/js-copy/">
-        </link>
-        <updated>2020-01-01T13:01:14.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="实现浅拷贝">实现浅拷贝</h2>
-<ul>
-<li>一、...实现</li>
-</ul>
-<pre><code>let copy = {...{a:1}};
-</code></pre>
-<ul>
-<li>二、(ES6)Object.assign实现</li>
-</ul>
-<pre><code>let copy = Object.assign({},{a:1});
-</code></pre>
-<h2 id="实现深拷贝">实现深拷贝</h2>
-<ul>
-<li>一、JSON.stringify()/JSON.parse()实现</li>
-</ul>
-<pre><code>let obj = {a: 1, b: {x: 3}};
-let deepCopy = JSON.parse(JSON.stringify(obj));
-</code></pre>
-<p><mark>注：这种方法实施的前提必须是实施的对象是JSON安全的</mark></p>
-<ul>
-<li>二、递归拷贝</li>
-</ul>
-<pre><code>function deepClone(obj) {
-    let copy = obj.instanceof Arrary ? [] : {};
-    for (let i in obj) {
-        if(obj.hasOwnProperty(i)) {
-            copy[i] = typeof obj[i] === 'object' ? deepClone(obj[i]) : obj[i];
-        }
-    }
-    return copy
-}
-
-</code></pre>
 ]]></content>
     </entry>
 </feed>
