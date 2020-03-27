@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://pxygogogo.github.io/favicon.ico?v=1585317644192">
+<link rel="shortcut icon" href="https://pxygogogo.github.io/favicon.ico?v=1585317898129">
 <link rel="stylesheet" href="https://pxygogogo.github.io/styles/main.css">
 
 
@@ -31,7 +31,7 @@ var arr = [1, [2, [3, 4]]]..." />
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://pxygogogo.github.io">
-        <img src="https://pxygogogo.github.io/images/avatar.png?v=1585317644192" class="site-logo">
+        <img src="https://pxygogogo.github.io/images/avatar.png?v=1585317898129" class="site-logo">
         <h1 class="site-title">小潘的博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -149,6 +149,14 @@ console.log(flatten(arr))
         return acc.concat(Array.isArray(cur) ? flatten(cur) : cur);
     },[])
 }
+</code></pre>
+<pre><code class="language-js">//简化
+const flatten =  (arr) =&gt; arr.reduce((acc,cur)=&gt; acc.concat(Array.isArray(cur) ? flatten(cur) : cur),[]);
+</code></pre>
+<h2 id="运用es6-扩展运算符">运用es6 扩展运算符</h2>
+<pre><code class="language-js">const flattenDeep = (arr) =&gt; Array.isArray(arr) ? arr.reduce( (a, b) =&gt; [...a, ...flattenDeep(b)] , []) : [arr];
+
+flattenDeep([1, [[2], [3, [4]], 5]])
 </code></pre>
 
             </div>

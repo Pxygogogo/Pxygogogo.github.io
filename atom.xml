@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-27T14:00:46.274Z</updated>
+    <updated>2020-03-27T14:05:01.928Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -692,6 +692,14 @@ console.log(flatten(arr))
         return acc.concat(Array.isArray(cur) ? flatten(cur) : cur);
     },[])
 }
+</code></pre>
+<pre><code class="language-js">//简化
+const flatten =  (arr) =&gt; arr.reduce((acc,cur)=&gt; acc.concat(Array.isArray(cur) ? flatten(cur) : cur),[]);
+</code></pre>
+<h2 id="运用es6-扩展运算符">运用es6 扩展运算符</h2>
+<pre><code class="language-js">const flattenDeep = (arr) =&gt; Array.isArray(arr) ? arr.reduce( (a, b) =&gt; [...a, ...flattenDeep(b)] , []) : [arr];
+
+flattenDeep([1, [[2], [3, [4]], 5]])
 </code></pre>
 ]]></content>
     </entry>
