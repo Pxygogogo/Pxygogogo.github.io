@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-26T03:26:54.650Z</updated>
+    <updated>2020-03-27T14:00:46.274Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -689,7 +689,7 @@ console.log(flatten(arr))
 <p>既然是对数组进行处理，最终返回一个值，我们就可以考虑使用 reduce 来简化代码：</p>
 <pre><code class="language-js">function flatten(arr){
     return arr.reduce((acc,cur)=&gt;{
-        return Array.isArray(acc) ? flatten(acc) : cur;
+        return acc.concat(Array.isArray(cur) ? flatten(cur) : cur);
     },[])
 }
 </code></pre>
