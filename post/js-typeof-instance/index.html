@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>js中call、apply实现 | 小潘的博客</title>
+<title>typeof 和 instance | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,18 +18,12 @@
 
 
 
-    <meta name="description" content="实现call()
-
-实现思路
-
-
-
-改变this指向：可以将目标函数作为这个对象的属性
-利用arguments类数组对象实现参数不定长
-不能增加对象的属性，所以在结尾需要delete
-
-
-Function.prototype.myCall ..." />
+    <meta name="description" content="typeof
+typeof 对于基本类型，除了 null都可以显示正确的类型
+typeof 1 // 'number'
+typeof '1' // 'string'
+typeof undefined // 'undefined'
+typeo..." />
     <meta name="keywords" content="js" />
   </head>
   <body>
@@ -101,70 +95,43 @@ Function.prototype.myCall ..." />
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">js中call、apply实现</h2>
-            <div class="post-date">2019-12-22</div>
+            <h2 class="post-title">typeof 和 instance</h2>
+            <div class="post-date">2020-03-28</div>
             
             <div class="post-content" v-pre>
-              <h2 id="实现call">实现call()</h2>
-<ul>
-<li>实现思路</li>
-</ul>
-<blockquote>
-<ol>
-<li>改变this指向：可以将目标函数作为这个对象的属性</li>
-<li>利用arguments类数组对象实现参数不定长</li>
-<li>不能增加对象的属性，所以在结尾需要delete</li>
-</ol>
-</blockquote>
-<pre><code>Function.prototype.myCall = function(context){
-    var context = context || window;   
-    context.fn = this;
-    let args = [...arguments].slice(1);
-    context.fn(...args);
-    delete context.fn;
-}
+              <h2 id="typeof">typeof</h2>
+<h3 id="typeof-对于基本类型除了-null都可以显示正确的类型">typeof 对于基本类型，除了 null都可以显示正确的类型</h3>
+<pre><code class="language-js">typeof 1 // 'number'
+typeof '1' // 'string'
+typeof undefined // 'undefined'
+typeof true // 'boolean'
+typeof Symbol() // 'symbol'
+typeof b // b 没有声明，但是还会显示 undefined
 </code></pre>
-<h2 id="实现apply">实现apply()</h2>
-<ul>
-<li>与call（）只有一个区别，apply第二个参数为数组</li>
-</ul>
-<pre><code>Function.prototype.myApply = function(context){
-    var context = context || window;
-    contex.fn = this;
-    // 需要判断是否存储第二个参数
-    // 如果存在，就将第二个参数展开
-    if(argument[1]){
-        context.fn(...argument[1]);
-    }else{
-        context.fn();
+<h3 id="typeof-对于对象除了函数都会显示-object">typeof 对于对象，除了函数都会显示 object</h3>
+<pre><code class="language-js">typeof [] // 'object'
+typeof {} // 'object'
+typeof console.log // 'function'
+</code></pre>
+<p>对于 null 来说，虽然它是基本类型，但是会显示 object，这是一个存在很久了的 Bug</p>
+<pre><code class="language-js">typeof null // 'object'
+</code></pre>
+<h2 id="instanceof">instanceof</h2>
+<h3 id="instanceof-可以正确的判断对象的类型因为内部机制是通过判断对象的原型链中是不是能找到类型的-prototype">instanceof 可以正确的判断对象的类型，因为内部机制是通过判断对象的原型链中是不是能找到类型的 prototype</h3>
+<pre><code class="language-js">试着实现一下 instanceof
+function instanceof(left, right) {
+    // 获得类型的原型
+    let prototype = right.prototype
+    // 获得对象的原型
+    left = left.__proto__
+    // 判断对象的类型是否等于类型的原型
+    while (true) {
+    	if (left === null)
+    		return false
+    	if (prototype === left)
+    		return true
+    	left = left.__proto__
     }
-    
-    delete context.fn;
-}
-</code></pre>
-<h2 id="实现bind">实现bind()</h2>
-<p>返回一个与被调函数具有相同函数体的新函数，且这个新函数也能使用new操作符。</p>
-<p><strong>实现思路</strong></p>
-<blockquote>
-<ol>
-<li>返回一个新函数，可以使用闭包</li>
-<li>bind（）传入的参数长度不定，使用函数内置的arguments对象数组，可利用Array.prototype.slice.call(arguments,1 )将其转化为数组</li>
-<li>返回的新函数中，使用apply改变被调用函数的this指向，将arguments转化成的数组作为apply的第二个参数</li>
-<li>因为返回的新函数也可以使用new操作符，所以在新函数内部需要判断是否使用了new操作符（为什么需要判断，后面会讲解到），如果使用则将apply的第一个参数设置为新创建的对象，如果没有则设置为在调用bind（）时所传入的对象（不传的话默认为window）。</li>
-</ol>
-</blockquote>
-<p>需要注意的是怎么去判断是否使用了new操作符呢？在解决这个问题之前，我们先看使用new操作符时具体干了些什么，下面是new操作符的简单实现过程：</p>
-<pre><code>//简洁版的new操作符实现过程
- 
-function newFunc(constructor){
-      //第一步：创建一个空对象obj 
-        var obj = {};
-       //第二步：将构造函数 constructor的原型对象赋给obj的原型
-        obj.__proto__ = constructor.prototype;
-      //第三步：将构造函数 constructor中的this指向obj,并立即执行构造函数内部的操作
-        constructor.apply(obj);
-      //第四步：返回这个对象
-        return obj;
 }
 </code></pre>
 
@@ -181,9 +148,9 @@ function newFunc(constructor){
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://pxygogogo.github.io/post/js-call-apply-bind/">
+                <a href="https://pxygogogo.github.io/post/js-properrty/">
                   <h3 class="post-title">
-                    js中call、apply、bind理解
+                    属性设置和屏蔽
                   </h3>
                 </a>
               </div>

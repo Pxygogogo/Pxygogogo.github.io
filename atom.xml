@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-27T14:14:16.915Z</updated>
+    <updated>2020-03-28T06:57:17.912Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -10,6 +10,49 @@
     <logo>https://pxygogogo.github.io/images/avatar.png</logo>
     <icon>https://pxygogogo.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[typeof 和 instance]]></title>
+        <id>https://pxygogogo.github.io/post/js-typeof-instance/</id>
+        <link href="https://pxygogogo.github.io/post/js-typeof-instance/">
+        </link>
+        <updated>2020-03-28T06:40:13.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="typeof">typeof</h2>
+<h3 id="typeof-对于基本类型除了-null都可以显示正确的类型">typeof 对于基本类型，除了 null都可以显示正确的类型</h3>
+<pre><code class="language-js">typeof 1 // 'number'
+typeof '1' // 'string'
+typeof undefined // 'undefined'
+typeof true // 'boolean'
+typeof Symbol() // 'symbol'
+typeof b // b 没有声明，但是还会显示 undefined
+</code></pre>
+<h3 id="typeof-对于对象除了函数都会显示-object">typeof 对于对象，除了函数都会显示 object</h3>
+<pre><code class="language-js">typeof [] // 'object'
+typeof {} // 'object'
+typeof console.log // 'function'
+</code></pre>
+<p>对于 null 来说，虽然它是基本类型，但是会显示 object，这是一个存在很久了的 Bug</p>
+<pre><code class="language-js">typeof null // 'object'
+</code></pre>
+<h2 id="instanceof">instanceof</h2>
+<h3 id="instanceof-可以正确的判断对象的类型因为内部机制是通过判断对象的原型链中是不是能找到类型的-prototype">instanceof 可以正确的判断对象的类型，因为内部机制是通过判断对象的原型链中是不是能找到类型的 prototype</h3>
+<pre><code class="language-js">试着实现一下 instanceof
+function instanceof(left, right) {
+    // 获得类型的原型
+    let prototype = right.prototype
+    // 获得对象的原型
+    left = left.__proto__
+    // 判断对象的类型是否等于类型的原型
+    while (true) {
+    	if (left === null)
+    		return false
+    	if (prototype === left)
+    		return true
+    	left = left.__proto__
+    }
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[属性设置和屏蔽]]></title>
         <id>https://pxygogogo.github.io/post/js-properrty/</id>
@@ -1022,191 +1065,6 @@ container.onmousemove = throttle(getUserAction, 1000, {
 container.onmousemove = throttle(getUserAction, 1000, {
     trailing: false
 });
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[防抖]]></title>
-        <id>https://pxygogogo.github.io/post/js-debounce/</id>
-        <link href="https://pxygogogo.github.io/post/js-debounce/">
-        </link>
-        <updated>2020-02-12T02:48:21.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
-<p>在前端开发中会遇到一些频繁的事件触发，比如：</p>
-<ol>
-<li>window 的 resize、scroll</li>
-<li>mousedown、mousemove</li>
-<li>keyup、keydown<br>
-......</li>
-</ol>
-<h2 id="引例">引例</h2>
-<p>index.html文件如下</p>
-<pre><code>&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;
-
-&lt;head&gt;
-    &lt;meta charset=&quot;utf-8&quot;&gt;
-    &lt;meta http-equiv=&quot;x-ua-compatible&quot; content=&quot;IE=edge, chrome=1&quot;&gt;
-    &lt;title&gt;debounce&lt;/title&gt;
-    &lt;style&gt;
-        #container{
-            width: 100%; height: 200px; line-height: 200px; text-align: center; color: #fff; background-color: #444; font-size: 30px;
-        }
-    &lt;/style&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-    &lt;div id=&quot;container&quot;&gt;&lt;/div&gt;
-    &lt;script&gt;
-        var count = 1;
-        var container = document.getElementById('container');
-    
-        function getUserAction() {
-            container.innerHTML = count++;
-        };
-    
-        container.onmousemove = getUserAction;
-    &lt;/script&gt;
-&lt;/body&gt;
-
-&lt;/html&gt;
-</code></pre>
-<p>效果如下：<br>
-<img src="https://i.loli.net/2020/03/25/U3I84RAEVWqksZN.gif" alt="演示效果" loading="lazy"></p>
-<p>从左边滑到右边就触发了 129 次 getUserAction 函数！</p>
-<p>因为这个例子很简单，所以浏览器完全反应的过来，可是如果是复杂的回调函数或是 ajax 请求呢？假设 1 秒触发了 60 次，每个回调就必须在 1000 / 60 = 16.67ms 内完成，否则就会有卡顿出现。</p>
-<p>为了解决这个问题，一般有两种解决方案：</p>
-<ol>
-<li>debounce 防抖</li>
-<li>throttle 节流</li>
-</ol>
-<p>下面重点介绍防抖的实现。</p>
-<h2 id="防抖">防抖</h2>
-<p>防抖的原理就是：你尽管触发事件，但是我一定在事件停止触发 n 秒后才执行。</p>
-<p>这意味着如果你在一个事件触发的 n 秒内又触发了这个事件，那我就以新的事件触发的时间为准，在此时间 n 秒后才执行。</p>
-<p>总之，就是要等你触发完事件 n 秒内不再触发事件，我才执行!</p>
-<h2 id="第一版">第一版</h2>
-<p>根据这段表述，我们可以轻松写出第一版的代码：</p>
-<pre><code class="language-js">//第一版
-function debounce(func,wait){
-    var timeout;
-    return function(){
-        clearTimeout(timeout);
-        timeout = setTimeOut(func,wait)
-    }
-}
-</code></pre>
-<p>如果我们要使用它，以最一开始的例子为例：</p>
-<pre><code class="language-js">container.onmousemove = debounce(getUserAction, 1000);
-</code></pre>
-<p>现在随你怎么移动，反正你移动完 1000ms 内不再触发，我才执行事件。</p>
-<h2 id="this">this</h2>
-<p>如果我们在 <code>getUserAction</code> 函数中 <code>console.log(this)</code>，在不使用 <code>debounce</code> 函数的时候，<code>this</code> 的值为：</p>
-<pre><code class="language-html">&lt;div id=&quot;container&quot;&gt;&lt;/div&gt;
-</code></pre>
-<p>但是如果使用我们的 debounce 函数，this 就会指向 Window 对象！</p>
-<p>所以我们需要将 this 指向正确的对象。</p>
-<p>我们修改下代码：</p>
-<pre><code class="language-js">//第二版
-function debounce(func,wait){
-    var timeout;
-    return function(){
-        var context = this;
-        clearTimeout(timeout);
-        timeout = setTimeOut(function(){
-            func.apply(context)
-        },wait)
-    }
-}
-</code></pre>
-<p>现在 this 已经可以正确指向了。让我们看下个问题：</p>
-<h2 id="event-对象">event 对象</h2>
-<p>JavaScript 在事件处理函数中会提供事件对象 event，我们修改下 getUserAction 函数：</p>
-<pre><code class="language-js">function getUserAction(e) {
-    console.log(e);
-    container.innerHTML = count++;
-};
-</code></pre>
-<p>如果我们不使用 debouce 函数，这里会打印 MouseEvent 对象</p>
-<p>但是在我们实现的 debounce 函数中，却只会打印 undefined!</p>
-<p>所以我们再修改一下代码：</p>
-<pre><code class="language-js">//第三版
-function debounce(func.wait){
-    var timeout;
-    return function(){
-        var context = this;
-        vat args = arguments;
-        clearTimeOut(timeout);
-        timeout = setTimeOut(function(){
-            func.apply(context,args)
-        },wait)
-    }
-}
-</code></pre>
-<p>到此为止，我们修复了两个小问题：</p>
-<ol>
-<li>this 指向</li>
-<li>event 对象</li>
-</ol>
-<h2 id="立刻执行">立刻执行</h2>
-<p>这个时候，代码已经很是完善了，但是为了让这个函数更加完善，我们接下来思考一个新的需求。</p>
-<p>这个需求就是：</p>
-<p>我不希望非要等到事件停止触发后才执行，我希望立刻执行函数，然后等到停止触发 n 秒后，才可以重新触发执行。</p>
-<p>想想这个需求也是很有道理的嘛，那我们加个 immediate 参数判断是否是立刻执行。</p>
-<pre><code class="language-js">// 第四版
-function debounce(func, wait, immediate) {
-
-    var timeout;
-
-    return function () {
-        var context = this;
-        var args = arguments;
-
-        if (timeout) clearTimeout(timeout);
-        if (immediate) {
-            // 如果已经执行过，不再执行
-            var callNow = !timeout;
-            timeout = setTimeout(function(){
-                timeout = null;
-            }, wait)
-            if (callNow) func.apply(context, args)
-        }
-        else {
-            timeout = setTimeout(function(){
-                func.apply(context, args)
-            }, wait);
-        }
-    }
-}
-</code></pre>
-<h2 id="返回值">返回值</h2>
-<p>此时注意一点，就是 getUserAction 函数可能是有返回值的，所以我们也要返回函数的执行结果，但是当 immediate 为 false 的时候，因为使用了 setTimeout ，我们将 func.apply(context, args) 的返回值赋给变量，最后再 return 的时候，值将会一直是 undefined，所以我们只在 immediate 为 true 的时候返回函数的执行结果。</p>
-<pre><code class="language-js">// 第五版
-function debounce(func, wait, immediate) {
-
-    var timeout, result;
-
-    return function () {
-        var context = this;
-        var args = arguments;
-
-        if (timeout) clearTimeout(timeout);
-        if (immediate) {
-            // 如果已经执行过，不再执行
-            var callNow = !timeout;
-            timeout = setTimeout(function(){
-                timeout = null;
-            }, wait)
-            if (callNow) result = func.apply(context, args)
-        }
-        else {
-            timeout = setTimeout(function(){
-                func.apply(context, args)
-            }, wait);
-        }
-        return result;
-    }
-}
 </code></pre>
 ]]></content>
     </entry>
