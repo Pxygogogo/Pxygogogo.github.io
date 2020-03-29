@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-03-29T09:45:28.090Z</updated>
+    <updated>2020-03-29T10:16:09.524Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -832,7 +832,8 @@ flattenDeep([1, [[2], [3, [4]], 5]])
 </code></pre>
 <p>双层循环，外层循环元素，内层循环时比较值。值相同时，则删去这个值。</p>
 <h2 id="三-利用indexof去重">三、利用indexOf去重</h2>
-<pre><code class="language-js">function unique(arr){
+<pre><code class="language-js">法一：
+function unique(arr){
     if(!Array.isArray(arr)){
         throw Error('wrong type,Array required')
     }
@@ -846,6 +847,17 @@ flattenDeep([1, [[2], [3, [4]], 5]])
 }
 </code></pre>
 <p>新建一个空的结果数组，for 循环原数组，判断结果数组是否存在当前元素，如果有相同的值则跳过，不相同则push进数组。</p>
+<pre><code class="language-js">法二：
+function unique(arr){
+    let mid = [];
+    for (let i = 0; i &lt; arr.length; i++) {
+        if(mid.indexOf(arr[i])){
+            arr.splice(i,1);
+        }        
+    }
+    return arr;
+}
+</code></pre>
 <h2 id="四-利用sort">四、利用sort()</h2>
 <pre><code class="language-js">function unique(arr){
     if(!Array.isArray(arr)){
