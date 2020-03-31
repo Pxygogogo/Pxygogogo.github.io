@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://pxygogogo.github.io/favicon.ico?v=1585476966261">
+<link rel="shortcut icon" href="https://pxygogogo.github.io/favicon.ico?v=1585642087822">
 <link rel="stylesheet" href="https://pxygogogo.github.io/styles/main.css">
 
 
@@ -35,7 +35,7 @@ function unique(array) {
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://pxygogogo.github.io">
-        <img src="https://pxygogogo.github.io/images/avatar.png?v=1585476966261" class="site-logo">
+        <img src="https://pxygogogo.github.io/images/avatar.png?v=1585642087822" class="site-logo">
         <h1 class="site-title">小潘的博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -150,17 +150,6 @@ function unique(arr){
 }
 </code></pre>
 <p>新建一个空的结果数组，for 循环原数组，判断结果数组是否存在当前元素，如果有相同的值则跳过，不相同则push进数组。</p>
-<pre><code class="language-js">法二：
-function unique(arr){
-    let mid = [];
-    for (let i = 0; i &lt; arr.length; i++) {
-        if(mid.indexOf(arr[i])){
-            arr.splice(i,1);
-        }        
-    }
-    return arr;
-}
-</code></pre>
 <h2 id="四-利用sort">四、利用sort()</h2>
 <pre><code class="language-js">function unique(arr){
     if(!Array.isArray(arr)){
