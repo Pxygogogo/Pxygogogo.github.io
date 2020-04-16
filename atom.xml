@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-04-12T10:25:38.574Z</updated>
+    <updated>2020-04-16T02:56:29.447Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -10,6 +10,30 @@
     <logo>https://pxygogogo.github.io/images/avatar.png</logo>
     <icon>https://pxygogogo.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[zsh: no matches found不能composer指定版本无标题.md]]></title>
+        <id>https://pxygogogo.github.io/post/tp-composer/</id>
+        <link href="https://pxygogogo.github.io/post/tp-composer/">
+        </link>
+        <updated>2020-04-16T02:55:43.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="问题">问题</h2>
+<pre><code>composer create-project topthink/think=5.0.* tp50 --prefer-dist
+</code></pre>
+<p>使用composer安装Thinkphp5.0时发生错误</p>
+<pre><code># 提示
+zsh: no matches found: think=5.0.*
+</code></pre>
+<h2 id="解决">解决</h2>
+<pre><code># 编辑
+nano ~/.zshrc
+# 添加
+setopt no_nomatch 
+# 生效
+source ~/.zshrc
+</code></pre>
+<p>再安装即可</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[回流与重绘]]></title>
         <id>https://pxygogogo.github.io/post/reflow-repaint/</id>
@@ -669,75 +693,6 @@ IdentityFile    ~/.ssh/id_rsa    #第一个步骤生成的公钥文件对应的�
 <ul>
 <li>配置成功后，即可直接通过<code>ssh alias</code>登录</li>
 </ul>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[数组扁平化]]></title>
-        <id>https://pxygogogo.github.io/post/js-flatten/</id>
-        <link href="https://pxygogogo.github.io/post/js-flatten/">
-        </link>
-        <updated>2020-02-14T07:22:29.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="扁平化">扁平化</h2>
-<p>数组的扁平化，就是将一个嵌套多层的数组 array (嵌套可以是任何层数)转换为只有一层的数组。</p>
-<p>举个例子，假设有个名为 flatten 的函数可以做到数组扁平化，效果就会如下：</p>
-<pre><code class="language-js">var arr = [1, [2, [3, 4]]];
-console.log(flatten(arr)) // [1, 2, 3, 4]
-</code></pre>
-<p>知道了效果是什么样的了，我们可以去尝试着写这个 flatten 函数了</p>
-<h2 id="递归">递归</h2>
-<p>我们最一开始能想到的莫过于循环数组元素，如果还是一个数组，就递归调用该方法：</p>
-<pre><code class="language-js">// 方法 1
-var arr = [1, [2, [3, 4]]];
-
-function flatten(arr) {
-    var result = [];
-    for (var i = 0,  i &lt; arr.length; i++) {
-        if (Array.isArray(arr[i])) {
-            result = result.concat(flatten(arr[i]))
-        }
-        else {
-            result.push(arr[i])
-        }
-    }
-    return result;
-}
-
-
-console.log(flatten(arr))
-</code></pre>
-<h2 id="tostring">toString</h2>
-<p>如果数组的元素都是数字，那么我们可以考虑使用 toString 方法，因为：</p>
-<pre><code class="language-js">[1, [2, [3, 4]]].toString() // &quot;1,2,3,4&quot;
-</code></pre>
-<p>调用 toString 方法，返回了一个逗号分隔的扁平的字符串，这时候我们再 split，然后转成数字不就可以实现扁平化了吗？</p>
-<pre><code class="language-js">// 方法2
-var arr = [1, [2, [3, 4]]];
-
-function flatten(arr) {
-    return arr.toString().split(',').map(function(item){
-        return +item
-    })
-}
-
-console.log(flatten(arr))
-</code></pre>
-<p>然而这种方法使用的场景却非常有限，如果数组是 [1, '1', 2, '2'] 的话，这种方法就会产生错误的结果。</p>
-<h2 id="reduce">reduce</h2>
-<p>既然是对数组进行处理，最终返回一个值，我们就可以考虑使用 reduce 来简化代码：</p>
-<pre><code class="language-js">function flatten(arr){
-    return arr.reduce((acc,cur)=&gt;{
-        return acc.concat(Array.isArray(cur) ? flatten(cur) : cur);
-    },[])
-}
-</code></pre>
-<pre><code class="language-js">//简化
-const flatten =  (arr) =&gt; arr.reduce((acc,cur)=&gt; acc.concat(Array.isArray(cur) ? flatten(cur) : cur),[]);
-</code></pre>
-<h2 id="运用es6-扩展运算符">运用es6 扩展运算符</h2>
-<pre><code class="language-js">const flattenDeep = (arr) =&gt; Array.isArray(arr) ? arr.reduce( (a, b) =&gt; [...a, ...flattenDeep(b)] , []) : [arr];
-
-flattenDeep([1, [[2], [3, [4]], 5]])
-</code></pre>
 ]]></content>
     </entry>
 </feed>

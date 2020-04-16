@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>js | 小潘的博客</title>
+<title>zsh: no matches found不能composer指定版本无标题.md | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,13 @@
 
 
 
-    <meta name="description" content="平凡的世界">
+    <meta name="description" content="问题
+composer create-project topthink/think=5.0.* tp50 --prefer-dist
+
+使用composer安装Thinkphp5.0时发生错误
+# 提示
+zsh: no matches fo..." />
+    <meta name="keywords" content="thinkphp" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,60 +94,52 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: js</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://pxygogogo.github.io/post/js-achieve-bind/">
-                  <h2 class="post-title">js中bind实现</h2>
-                </a>
-                <div class="post-date">
-                  2019-12-22
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://pxygogogo.github.io/post/js-achieve-call-apply/">
-                  <h2 class="post-title">js中call、apply实现</h2>
-                </a>
-                <div class="post-date">
-                  2019-12-22
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://pxygogogo.github.io/post/js-this/">
-                  <h2 class="post-title">this绑定</h2>
-                </a>
-                <div class="post-date">
-                  2019-12-21
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">zsh: no matches found不能composer指定版本无标题.md</h2>
+            <div class="post-date">2020-04-16</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="问题">问题</h2>
+<pre><code>composer create-project topthink/think=5.0.* tp50 --prefer-dist
+</code></pre>
+<p>使用composer安装Thinkphp5.0时发生错误</p>
+<pre><code># 提示
+zsh: no matches found: think=5.0.*
+</code></pre>
+<h2 id="解决">解决</h2>
+<pre><code># 编辑
+nano ~/.zshrc
+# 添加
+setopt no_nomatch 
+# 生效
+source ~/.zshrc
+</code></pre>
+<p>再安装即可</p>
 
-          <div class="pagination-container">
-  
-    <a href="https://pxygogogo.github.io/tag/js" class="prev"><i class="icon-arrow-ios-back-outline"></i> 上一页</a>
-  
-  
-</div>
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://pxygogogo.github.io/tag/thinkphp/" class="tag">
+                    thinkphp
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://pxygogogo.github.io/post/reflow-repaint/">
+                  <h3 class="post-title">
+                    回流与重绘
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>
