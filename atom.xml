@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://pxygogogo.github.io</id>
     <title>小潘的博客</title>
-    <updated>2020-04-16T02:56:29.447Z</updated>
+    <updated>2020-04-16T03:27:47.320Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://pxygogogo.github.io"/>
     <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
@@ -10,6 +10,41 @@
     <logo>https://pxygogogo.github.io/images/avatar.png</logo>
     <icon>https://pxygogogo.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[css常见单位]]></title>
+        <id>https://pxygogogo.github.io/post/css-unit/</id>
+        <link href="https://pxygogogo.github.io/post/css-unit/">
+        </link>
+        <updated>2020-04-16T03:27:08.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="常见单位">常见单位</h2>
+<ol>
+<li>px：像素相对长度单位，相对于显示器屏幕分辨率</li>
+<li>em：相对长度单位基准点为父节点字体的大小，如果自身定义了font-size按自身来计算（浏览器默认字体是16px），整个页面内1em不是一个固定的值。</li>
+<li>rem：相对单位可理解为”root em”, 相对根节点html的字体大小来计算，CSS3新加属性，chrome/firefox/IE9+支持。</li>
+<li>vw：viewpoint width，视窗宽度，1vw等于视窗宽度的1%。</li>
+<li>vh：viewpoint height，视窗高度，1vh等于视窗高度的1%。</li>
+<li>vmin：vw和vh中较小的那个。</li>
+<li>vmax：vw和vh中较大的那个。</li>
+<li>%:百分比</li>
+<li>in:寸</li>
+<li>cm:厘米</li>
+<li>mm:毫米</li>
+<li>pt:point，大约1/72寸</li>
+<li>pc:pica，大约6pt，1/6寸</li>
+<li>ex：取当前作用效果的字体的x的高度，在无法确定x高度的情况下以0.5em计算(IE11及以下均不支持，firefox/chrome/safari/opera/ios safari/android browser4.4+等均需属性加么有前缀)</li>
+<li>ch:以节点所使用字体中的“0”字符为基准，找不到时为0.5em(ie10+,chrome31+,safair7.1+,opera26+,ios safari 7.1+,android browser4.4+支持)</li>
+</ol>
+<h2 id="常用">常用</h2>
+<p>其中用的最多的单位是<strong>px、em、rem</strong>，这三个的区别是：<br>
+px是固定的像素，一旦设置了就无法因为适应页面大小而改变。</p>
+<p>em和rem相对于px更具有灵活性，他们是相对长度单位，意思是长度不是定死了的，更适用于响应式布局。</p>
+<p>对于em和rem的区别一句话概括：em相对于父元素，rem相对于根元素。</p>
+<p>rem中的r意思是root（根源），这也就不难理解了。</p>
+<p><mark>em/rem</mark>：用于做响应式页面，不过我更倾向于rem，因为em不同元素的参照物不一样（都是该元素父元素），所以在计算的时候不方便，相比之下rem就只有一个参照物（html元素），这样计算起来更清晰。</p>
+<p>关于vh/vw与%区别：<br>
+vh和vw大小是相对于视口的高度和宽度，而不是父元素的，%单位是相对于包含它的最近的父元素的高度和宽度。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[zsh: no matches found不能composer指定版本无标题.md]]></title>
         <id>https://pxygogogo.github.io/post/tp-composer/</id>
@@ -625,74 +660,6 @@ module.exports = mongoose.model('Notice',schema);
         }
     });
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[ssh 免密码快速登录（MacOs）]]></title>
-        <id>https://pxygogogo.github.io/post/ssh-login/</id>
-        <link href="https://pxygogogo.github.io/post/ssh-login/">
-        </link>
-        <updated>2020-03-05T11:47:14.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="1创建秘钥文件">1.创建秘钥文件</h2>
-<ul>
-<li>打开终端，执行 ssh-keygen 命令创建密钥对：</li>
-</ul>
-<blockquote>
-<pre><code class="language-bash">ssh-keygen -t rsa -C 'your email@domain.com'
--t 指定密钥类型，默认即 rsa ，可以省略
--C 设置注释文字，比如你的邮箱，可以省略
-</code></pre>
-</blockquote>
-<ul>
-<li>生成过程中会提示输入密码两次，如果不想在使用公钥的时候输入密码，可以回车跳过；<br>
-密钥默认保存位置在 <code>~/.ssh</code> 目录下，打开后会看到私钥文件 <code>id_rsa</code> 和公钥文件 <code>id_rsa.pub</code>；</li>
-</ul>
-<h2 id="2复制公钥至服务器">2.复制公钥至服务器</h2>
-<ul>
-<li>
-<p>通过宝塔面板直接将<code>~/.ssh/id_rsa.pub</code>配置到服务器的<code>~/.ssh/authorized_keys</code>文件中</p>
-</li>
-<li>
-<p>使用 scp 命令将本地的公钥文件 <code>id_rsa.pub</code> 复制到需要连接的Linux服务器：</p>
-<pre><code class="language-bash">scp ~/.ssh/id_rsa.pub &lt;用户名&gt;@&lt;ip地址&gt;:/home/id_rsa.pub
-</code></pre>
-</li>
-<li>
-<p>如果修改了ssh默认连接端口的话，需要加上端口信息：</p>
-<pre><code class="language-bash">scp -P &lt;端口号&gt; ~/.ssh/id_rsa.pub &lt;用户名&gt;@&lt;ip地址&gt;:/home/id_rsa.pub
-</code></pre>
-</li>
-<li>
-<p>把公钥追加到服务器ssh认证文件中:</p>
-<pre><code class="language-bash">cat /home/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys
-</code></pre>
-</li>
-<li>
-<p>这时候在本地终端中使用用户名和ip登录就不需要密码了：</p>
-<pre><code class="language-xml">ssh &lt;用户名&gt;@&lt;ip&gt;
-</code></pre>
-</li>
-<li>
-<p>如果修改了ssh默认连接端口的话，需要加上端口信息：</p>
-<pre><code class="language-xml">ssh -p &lt;端口号&gt; &lt;用户名&gt;@&lt;ip地址&gt;
-</code></pre>
-</li>
-</ul>
-<h2 id="3配置快捷登录">3.配置快捷登录</h2>
-<ul>
-<li>在本地 <code>~/.ssh/config</code> 配置文件中添加ssh服务器信息（可多个），格式：</li>
-</ul>
-<blockquote>
-<pre><code class="language-ruby">Host            alias            #自定义别名
-HostName        hostname         #替换为你的ssh服务器ip或domain
-Port            port             #ssh服务器端口，默认为22
-User            user             #ssh服务器用户名
-IdentityFile    ~/.ssh/id_rsa    #第一个步骤生成的公钥文件对应的私钥文件
-</code></pre>
-</blockquote>
-<ul>
-<li>配置成功后，即可直接通过<code>ssh alias</code>登录</li>
-</ul>
 ]]></content>
     </entry>
 </feed>
