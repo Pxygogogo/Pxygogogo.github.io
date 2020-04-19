@@ -1,5 +1,5 @@
 ---
-title: 'zsh: no matches found不能composer指定版本无标题.md'
+title: 'zsh: no matches found不能指定版本'
 date: 2020-04-16 10:55:43
 tags: [thinkphp]
 published: true
