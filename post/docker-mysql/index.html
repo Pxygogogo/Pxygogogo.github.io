@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>zsh: no matches found不能指定版本 | 小潘的博客</title>
+<title>docker创建mysql数据库并导入sql文件 | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,13 +18,13 @@
 
 
 
-    <meta name="description" content="问题
-composer create-project topthink/think=5.0.* tp50 --prefer-dist
+    <meta name="description" content="1.安装mysql
+1.1 拉取镜像（以5.7.26为例）
+docker pull mysql:5.7.26
 
-使用composer安装Thinkphp5.0时发生错误
-# 提示
-zsh: no matches fo..." />
-    <meta name="keywords" content="thinkphp" />
+1.2 运行容器
+docker run -itd --name mysql-test -p 3307:3306 -e MYSQL..." />
+    <meta name="keywords" content="docker" />
   </head>
   <body>
     <div id="app" class="main">
@@ -95,33 +95,60 @@ zsh: no matches fo..." />
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">zsh: no matches found不能指定版本</h2>
-            <div class="post-date">2020-04-16</div>
+            <h2 class="post-title">docker创建mysql数据库并导入sql文件</h2>
+            <div class="post-date">2020-04-23</div>
             
             <div class="post-content" v-pre>
-              <h2 id="问题">问题</h2>
-<pre><code>composer create-project topthink/think=5.0.* tp50 --prefer-dist
+              <h2 id="1安装mysql">1.安装mysql</h2>
+<h3 id="11-拉取镜像以5726为例">1.1 拉取镜像（以5.7.26为例）</h3>
+<pre><code>docker pull mysql:5.7.26
 </code></pre>
-<p>使用composer安装Thinkphp5.0时发生错误</p>
-<pre><code># 提示
-zsh: no matches found: think=5.0.*
+<h3 id="12-运行容器">1.2 运行容器</h3>
+<pre><code>docker run -itd --name mysql-test -p 3307:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
 </code></pre>
-<h2 id="解决">解决</h2>
-<pre><code># 编辑
-nano ~/.zshrc
-# 添加
-setopt no_nomatch 
-# 生效
-source ~/.zshrc
+<p>参数说明：</p>
+<ul>
+<li>-p 3307:3306 ：映射容器服务的 3307 端口到宿主机的 3306 端口，外部主机可以直接通过 宿主机ip:3307 访问到 MySQL 的服务。</li>
+<li>MYSQL_ROOT_PASSWORD=123456：设置 MySQL 服务 root 用户的密码。</li>
+</ul>
+<h2 id="2docker操作mysql创建数据库">2.docker操作mysql创建数据库</h2>
+<h3 id="21-确定linux中的docker容器mysql正常运行">2.1 确定linux中的docker容器（mysql）正常运行</h3>
+<h3 id="22-执行命令docker-exec-it-容器名称-bash-进入容器bash-即进入到mysql容器中">2.2 执行命令：“docker exec -it 容器名称 bash” 进入容器bash-即进入到mysql容器中</h3>
+<h3 id="23-登录mysqlmysql-uroot-p-使用root账号登录mysql">2.3 登录mysql：mysql -uroot -p      使用root账号登录mysql</h3>
+<h3 id="24-页面提示输入密码数据root-账号所属密码登录到mysql中">2.4 页面提示输入密码——数据root 账号所属密码，登录到mysql中</h3>
+<h3 id="25-create-database-数据库名称-命令创建新数据库">2.5 create database 数据库名称  命令创建新数据库；</h3>
+<blockquote>
+<p>注：所有的mysql命名末尾一定要加“;”<br>
+mysql基本命令：</p>
+<p>-h数据库主机<br>
+-u用户<br>
+-p密码<br>
+-P端口号（大写P）</p>
+<p>例如：mysql -h127.0.0.1 -uroot -p123456 -P3306<br>
+PS:-p密码部分，可以直接指定密码，如果不指定，会提示输入密码。</p>
+</blockquote>
+<h2 id="3将准备好的sql文件导入到docker中的mysql中">3.将准备好的sql文件导入到docker中的mysql中</h2>
+<h3 id="31-备份sql文件存储目录">3.1 备份sql文件存储目录</h3>
+<pre><code>/data
 </code></pre>
-<p>再安装即可</p>
+<h3 id="32-查看当前mysql容器名称">3.2 查看当前mysql容器名称</h3>
+<pre><code>docker ps
+</code></pre>
+<h3 id="33-将sql导入mysql">3.3 将sql导入mysql</h3>
+<pre><code>docker exec -i mysql5.7 mysql -uroot -p123456 mydb &lt; /data/mydb.sql
+</code></pre>
+<blockquote>
+<p>注：</p>
+<p>mydb 为：数据库名</p>
+<p>mysql5.7 为：容器名</p>
+</blockquote>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://xiayun.pro/tag/thinkphp/" class="tag">
-                    thinkphp
+                  <a href="https://xiayun.pro/tag/docker/" class="tag">
+                    docker
                   </a>
                 
               </div>
@@ -129,9 +156,9 @@ source ~/.zshrc
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://xiayun.pro/post/reflow-repaint/">
+                <a href="https://xiayun.pro/post/mamp-pro-settings/">
                   <h3 class="post-title">
-                    回流与重绘
+                    MAMP Pro更改文件上传大小限制
                   </h3>
                 </a>
               </div>
