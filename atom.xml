@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://pxygogogo.github.io</id>
+    <id>https://xiayun.pro</id>
     <title>小潘的博客</title>
-    <updated>2020-04-20T12:27:08.236Z</updated>
+    <updated>2020-04-23T04:12:14.913Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://pxygogogo.github.io"/>
-    <link rel="self" href="https://pxygogogo.github.io/atom.xml"/>
+    <link rel="alternate" href="https://xiayun.pro"/>
+    <link rel="self" href="https://xiayun.pro/atom.xml"/>
     <subtitle>平凡的世界</subtitle>
-    <logo>https://pxygogogo.github.io/images/avatar.png</logo>
-    <icon>https://pxygogogo.github.io/favicon.ico</icon>
+    <logo>https://xiayun.pro/images/avatar.png</logo>
+    <icon>https://xiayun.pro/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
     <entry>
         <title type="html"><![CDATA[MAMP Pro更改文件上传大小限制]]></title>
-        <id>https://pxygogogo.github.io/post/mamp-pro-settings/</id>
-        <link href="https://pxygogogo.github.io/post/mamp-pro-settings/">
+        <id>https://xiayun.pro/post/mamp-pro-settings/</id>
+        <link href="https://xiayun.pro/post/mamp-pro-settings/">
         </link>
         <updated>2020-04-20T12:10:42.000Z</updated>
         <content type="html"><![CDATA[<blockquote>
@@ -39,8 +39,8 @@ memory_limit = 1024M        ; 最大的内存消耗
     </entry>
     <entry>
         <title type="html"><![CDATA[css常见单位]]></title>
-        <id>https://pxygogogo.github.io/post/css-unit/</id>
-        <link href="https://pxygogogo.github.io/post/css-unit/">
+        <id>https://xiayun.pro/post/css-unit/</id>
+        <link href="https://xiayun.pro/post/css-unit/">
         </link>
         <updated>2020-04-16T03:27:08.000Z</updated>
         <content type="html"><![CDATA[<h2 id="常见单位">常见单位</h2>
@@ -74,8 +74,8 @@ vh和vw大小是相对于视口的高度和宽度，而不是父元素的，%单
     </entry>
     <entry>
         <title type="html"><![CDATA[zsh: no matches found不能指定版本]]></title>
-        <id>https://pxygogogo.github.io/post/tp-composer/</id>
-        <link href="https://pxygogogo.github.io/post/tp-composer/">
+        <id>https://xiayun.pro/post/tp-composer/</id>
+        <link href="https://xiayun.pro/post/tp-composer/">
         </link>
         <updated>2020-04-16T02:55:43.000Z</updated>
         <content type="html"><![CDATA[<h2 id="问题">问题</h2>
@@ -98,8 +98,8 @@ source ~/.zshrc
     </entry>
     <entry>
         <title type="html"><![CDATA[回流与重绘]]></title>
-        <id>https://pxygogogo.github.io/post/reflow-repaint/</id>
-        <link href="https://pxygogogo.github.io/post/reflow-repaint/">
+        <id>https://xiayun.pro/post/reflow-repaint/</id>
+        <link href="https://xiayun.pro/post/reflow-repaint/">
         </link>
         <updated>2020-04-12T10:24:09.000Z</updated>
         <content type="html"><![CDATA[<p><mark>一句话：回流必将引起重绘，重绘不一定会引起回流。</mark></p>
@@ -190,8 +190,8 @@ source ~/.zshrc
     </entry>
     <entry>
         <title type="html"><![CDATA[如何正确给用户密码加密（转载）]]></title>
-        <id>https://pxygogogo.github.io/post/encrypt/</id>
-        <link href="https://pxygogogo.github.io/post/encrypt/">
+        <id>https://xiayun.pro/post/encrypt/</id>
+        <link href="https://xiayun.pro/post/encrypt/">
         </link>
         <updated>2020-04-10T14:03:08.000Z</updated>
         <content type="html"><![CDATA[<p><a href="https://www.infoq.cn/article/how-to-encrypt-the-user-password-correctly">原文</a></p>
@@ -199,8 +199,8 @@ source ~/.zshrc
     </entry>
     <entry>
         <title type="html"><![CDATA[https详解]]></title>
-        <id>https://pxygogogo.github.io/post/https/</id>
-        <link href="https://pxygogogo.github.io/post/https/">
+        <id>https://xiayun.pro/post/https/</id>
+        <link href="https://xiayun.pro/post/https/">
         </link>
         <updated>2020-04-08T13:58:12.000Z</updated>
         <content type="html"><![CDATA[<h2 id="什么是https">什么是HTTPS</h2>
@@ -326,8 +326,8 @@ source ~/.zshrc
     </entry>
     <entry>
         <title type="html"><![CDATA[http演变史]]></title>
-        <id>https://pxygogogo.github.io/post/http-history/</id>
-        <link href="https://pxygogogo.github.io/post/http-history/">
+        <id>https://xiayun.pro/post/http-history/</id>
+        <link href="https://xiayun.pro/post/http-history/">
         </link>
         <updated>2020-04-07T12:46:02.000Z</updated>
         <content type="html"><![CDATA[<p>HTTP 是基于 TCP/IP 协议的应用层协议。它不涉及数据包（packet）传输，主要规定了客户端和服务器之间的通信格式，默认使用80端口。</p>
@@ -394,8 +394,8 @@ Accept: */*
     </entry>
     <entry>
         <title type="html"><![CDATA[typeof 和 instance]]></title>
-        <id>https://pxygogogo.github.io/post/js-typeof-instance/</id>
-        <link href="https://pxygogogo.github.io/post/js-typeof-instance/">
+        <id>https://xiayun.pro/post/js-typeof-instance/</id>
+        <link href="https://xiayun.pro/post/js-typeof-instance/">
         </link>
         <updated>2020-03-28T06:40:13.000Z</updated>
         <content type="html"><![CDATA[<h2 id="typeof">typeof</h2>
@@ -437,8 +437,8 @@ function instanceof(left, right) {
     </entry>
     <entry>
         <title type="html"><![CDATA[属性设置和屏蔽]]></title>
-        <id>https://pxygogogo.github.io/post/js-properrty/</id>
-        <link href="https://pxygogogo.github.io/post/js-properrty/">
+        <id>https://xiayun.pro/post/js-properrty/</id>
+        <link href="https://xiayun.pro/post/js-properrty/">
         </link>
         <updated>2020-03-16T01:46:39.000Z</updated>
         <content type="html"><![CDATA[<h2 id="属性设置和屏蔽">属性设置和屏蔽</h2>
@@ -473,8 +473,8 @@ function instanceof(left, right) {
     </entry>
     <entry>
         <title type="html"><![CDATA[浏览器中堆栈内存的底层处理]]></title>
-        <id>https://pxygogogo.github.io/post/stack-heap-in-browser/</id>
-        <link href="https://pxygogogo.github.io/post/stack-heap-in-browser/">
+        <id>https://xiayun.pro/post/stack-heap-in-browser/</id>
+        <link href="https://xiayun.pro/post/stack-heap-in-browser/">
         </link>
         <updated>2020-03-13T05:31:01.000Z</updated>
         <content type="html"><![CDATA[<h2 id="浏览器执行代码需要经历什么">浏览器执行代码需要经历什么</h2>
