@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>css常见单位 | 小潘的博客</title>
+<title>redux小技巧 | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,12 +18,14 @@
 
 
 
-    <meta name="description" content="常见单位
+    <meta name="description" content="
+把Action Types单独写入一个文件
+单独出来的原因：
 
-px：像素相对长度单位，相对于显示器屏幕分辨率
-em：相对长度单位基准点为父节点字体的大小，如果自身定义了font-size按自身来计算（浏览器默认字体是16px），整个页面内1em不是一个固定的值。
-rem：相对单位可理解为”..." />
-    <meta name="keywords" content="css" />
+
+这些Types如果不统一管理，不利于大型项目的服用，设置会长生冗余代码。
+因为Action里的Type，一定要和Reducer里的type一一对应在，所以这部分代码或字母写..." />
+    <meta name="keywords" content="redux" />
   </head>
   <body>
     <div id="app" class="main">
@@ -94,44 +96,72 @@ rem：相对单位可理解为”..." />
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">css常见单位</h2>
-            <div class="post-date">2020-04-16</div>
+            <h2 class="post-title">redux小技巧</h2>
+            <div class="post-date">2020-05-10</div>
             
             <div class="post-content" v-pre>
-              <h2 id="常见单位">常见单位</h2>
-<ol>
-<li>px：像素相对长度单位，相对于显示器屏幕分辨率</li>
-<li>em：相对长度单位基准点为父节点字体的大小，如果自身定义了font-size按自身来计算（浏览器默认字体是16px），整个页面内1em不是一个固定的值。</li>
-<li>rem：相对单位可理解为”root em”, 相对根节点html的字体大小来计算，CSS3新加属性，chrome/firefox/IE9+支持。</li>
-<li>vw：viewpoint width，视窗宽度，1vw等于视窗宽度的1%。</li>
-<li>vh：viewpoint height，视窗高度，1vh等于视窗高度的1%。</li>
-<li>vmin：vw和vh中较小的那个。</li>
-<li>vmax：vw和vh中较大的那个。</li>
-<li>%:百分比</li>
-<li>in:寸</li>
-<li>cm:厘米</li>
-<li>mm:毫米</li>
-<li>pt:point，大约1/72寸</li>
-<li>pc:pica，大约6pt，1/6寸</li>
-<li>ex：取当前作用效果的字体的x的高度，在无法确定x高度的情况下以0.5em计算(IE11及以下均不支持，firefox/chrome/safari/opera/ios safari/android browser4.4+等均需属性加么有前缀)</li>
-<li>ch:以节点所使用字体中的“0”字符为基准，找不到时为0.5em(ie10+,chrome31+,safair7.1+,opera26+,ios safari 7.1+,android browser4.4+支持)</li>
+              <ol>
+<li>把Action Types单独写入一个文件<br>
+单独出来的原因：</li>
 </ol>
-<h2 id="常用">常用</h2>
-<p>其中用的最多的单位是<strong>px、em、rem</strong>，这三个的区别是：<br>
-px是固定的像素，一旦设置了就无法因为适应页面大小而改变。</p>
-<p>em和rem相对于px更具有灵活性，他们是相对长度单位，意思是长度不是定死了的，更适用于响应式布局。</p>
-<p>对于em和rem的区别一句话概括：em相对于父元素，rem相对于根元素。</p>
-<p>rem中的r意思是root（根源），这也就不难理解了。</p>
-<p><mark>em/rem</mark>：用于做响应式页面，不过我更倾向于rem，因为em不同元素的参照物不一样（都是该元素父元素），所以在计算的时候不方便，相比之下rem就只有一个参照物（html元素），这样计算起来更清晰。</p>
-<p>关于vh/vw与%区别：<br>
-vh和vw大小是相对于视口的高度和宽度，而不是父元素的，%单位是相对于包含它的最近的父元素的高度和宽度。</p>
+<ul>
+<li>这些Types如果不统一管理，不利于大型项目的服用，设置会长生冗余代码。</li>
+<li>因为Action里的Type，一定要和Reducer里的type一一对应在，所以这部分代码或字母写错后，浏览器里并没有明确的报错，这给调试带来了极大的困难。</li>
+</ul>
+<p>例：</p>
+<pre><code class="language-js">// 导出 目录：src/store/actionTypes.js
+export const  CHANGE_INPUT = 'changeInput'
+export const  ADD_ITEM = 'addItem'
+export const  DELETE_ITEM = 'deleteItem'
+
+// 引入
+import { CHANGE_INPUT , ADD_ITEM , DELETE_ITEM } from './store/actionTypes'
+</code></pre>
+<ol start="2">
+<li>把所有的Redux Action放到一个文件里进行管理</li>
+</ol>
+<p>例：</p>
+<pre><code>// 目录：src/store/actionCreators.js
+import {CHANGE_INPUT}  from './actionTypes'
+
+export const changeInputAction = (value)=&gt;({
+    type:CHANGE_INPUT,
+    value
+})
+// 引入
+import {changeInputAction} from './store/actionCreatores'
+changeInputValue(e){
+    const action = changeInputAction(e.target.value)
+    store.dispatch(action)
+}
+</code></pre>
+<ol start="3">
+<li>redux三个小坑</li>
+</ol>
+<ul>
+<li>store必须是唯一的，多个store是坚决不允许，只能有一个store空间</li>
+<li>只有store能改变自己的内容，Reducer不能改变</li>
+<li>Reducer必须是纯函数</li>
+</ul>
+<p><strong>纯函数定义</strong></p>
+<blockquote>
+<p>如果函数的调用参数相同，则永远返回相同的结果。它不依赖于程序执行期间函数外部任何状态或数据的变化，必须只依赖于其输入参数。</p>
+</blockquote>
+<p>比如在Reducer里增加一个异步ajax函数，获取一些后端接口数据，然后再返回，这就是不允许的（包括你使用日期函数也是不允许的），因为违反了调用参数相同，返回相同的纯函数规则</p>
+<ol start="4">
+<li>可选的好方式</li>
+</ol>
+<ul>
+<li>UI和业务逻辑分离</li>
+<li>无状s态组件</li>
+</ul>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://xiayun.im/tag/css/" class="tag">
-                    css
+                  <a href="https://xiayun.im/tag/redux/" class="tag">
+                    redux
                   </a>
                 
               </div>
@@ -139,9 +169,9 @@ vh和vw大小是相对于视口的高度和宽度，而不是父元素的，%单
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://xiayun.im/post/tp-composer/">
+                <a href="https://xiayun.im/post/tp5-nigix-404/">
                   <h3 class="post-title">
-                    zsh: no matches found不能指定版本
+                    ThinkPHP5+宝塔+nginx环境下访问路由出现404问题
                   </h3>
                 </a>
               </div>
