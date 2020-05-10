@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>typeof 和 instance | 小潘的博客</title>
+<title>redux理解 | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,13 +18,23 @@
 
 
 
-    <meta name="description" content="typeof
-typeof 对于基本类型，除了 null都可以显示正确的类型
-typeof 1 // 'number'
-typeof '1' // 'string'
-typeof undefined // 'undefined'
-typeo..." />
-    <meta name="keywords" content="js" />
+    <meta name="description" content="
+
+一个比喻：
+
+
+component --- 读者
+store --- 图书馆
+reducer --- 图书管理员
+action --- 读者的动作
+
+
+流程理解
+
+
+所有component的数据状态均来自统一的store中
+如果需要更新..." />
+    <meta name="keywords" content="redux" />
   </head>
   <body>
     <div id="app" class="main">
@@ -95,52 +105,56 @@ typeo..." />
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">typeof 和 instance</h2>
-            <div class="post-date">2020-03-28</div>
+            <h2 class="post-title">redux理解</h2>
+            <div class="post-date">2020-05-10</div>
             
             <div class="post-content" v-pre>
-              <h2 id="typeof">typeof</h2>
-<h3 id="typeof-对于基本类型除了-null都可以显示正确的类型">typeof 对于基本类型，除了 null都可以显示正确的类型</h3>
-<pre><code class="language-js">typeof 1 // 'number'
-typeof '1' // 'string'
-typeof undefined // 'undefined'
-typeof true // 'boolean'
-typeof Symbol() // 'symbol'
-typeof b // b 没有声明，但是还会显示 undefined
-</code></pre>
-<h3 id="typeof-对于对象除了函数都会显示-object">typeof 对于对象，除了函数都会显示 object</h3>
-<pre><code class="language-js">typeof [] // 'object'
-typeof {} // 'object'
-typeof console.log // 'function'
-</code></pre>
-<p>对于 null 来说，虽然它是基本类型，但是会显示 object，这是一个存在很久了的 Bug</p>
-<pre><code class="language-js">typeof null // 'object'
-</code></pre>
-<h2 id="instanceof">instanceof</h2>
-<h3 id="instanceof-可以正确的判断对象的类型因为内部机制是通过判断对象的原型链中是不是能找到类型的-prototype">instanceof 可以正确的判断对象的类型，因为内部机制是通过判断对象的原型链中是不是能找到类型的 prototype</h3>
-<pre><code class="language-js">试着实现一下 instanceof
-function instanceof(left, right) {
-    // 获得类型的原型
-    let prototype = right.prototype
-    // 获得对象的原型
-    left = left.__proto__
-    // 判断对象的类型是否等于类型的原型
-    while (true) {
-    	if (left === null)
-    		return false
-    	if (prototype === left)
-    		return true
-    	left = left.__proto__
-    }
-}
-</code></pre>
+              <figure data-type="image" tabindex="1"><img src="https://s1.ax1x.com/2020/05/09/YMT4Hg.jpg" alt="redux工作流程" loading="lazy"></figure>
+<ol>
+<li>一个比喻：</li>
+</ol>
+<ul>
+<li>component --- 读者</li>
+<li>store --- 图书馆</li>
+<li>reducer --- 图书管理员</li>
+<li>action --- 读者的动作</li>
+</ul>
+<ol start="2">
+<li>流程理解</li>
+</ol>
+<ul>
+<li>所有component的数据状态均来自统一的store中</li>
+<li>如果需要更新store中的数据，需要在对应的事件中定义一个action，action就是一个对象，这个对象一般有两个属性，第一个是对action的描述，第二个是要改变的值</li>
+<li>action会通过dispatch方法将type和value通过store的自动推送策略直接传递给reducer（虚线的作用）</li>
+<li>reducer的两个参数</li>
+</ul>
+<blockquote>
+<p>state：指的是原始仓库里的状态</p>
+<p>action: 指的是action新传递的状态</p>
+</blockquote>
+<ul>
+<li>reducer中不能直接修改state，需要深拷贝一个state对象，然后在新的state对象上操作，并最终返回新的state</li>
+</ul>
+<ol start="3">
+<li>注意点</li>
+</ol>
+<ul>
+<li>store必须是唯一的，多个store是坚决不允许，只能有一个store空间</li>
+<li>只有store能改变自己的内容，Reducer不能改变</li>
+<li>Reducer必须是纯函数</li>
+</ul>
+<p><strong>纯函数定义</strong></p>
+<blockquote>
+<p>如果函数的调用参数相同，则永远返回相同的结果。它不依赖于程序执行期间函数外部任何状态或数据的变化，必须只依赖于其输入参数。</p>
+</blockquote>
+<p>比如在Reducer里增加一个异步ajax函数，获取一些后端接口数据，然后再返回，这就是不允许的（包括你使用日期函数也是不允许的），因为违反了调用参数相同，返回相同的纯函数规则</p>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://xiayun.im/tag/js/" class="tag">
-                    js
+                  <a href="https://xiayun.im/tag/redux/" class="tag">
+                    redux
                   </a>
                 
               </div>
@@ -148,9 +162,9 @@ function instanceof(left, right) {
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://xiayun.im/post/js-properrty/">
+                <a href="https://xiayun.im/post/redux-tips/">
                   <h3 class="post-title">
-                    属性设置和屏蔽
+                    redux小技巧
                   </h3>
                 </a>
               </div>
