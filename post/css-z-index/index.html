@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>redux小技巧 | 小潘的博客</title>
+<title>css踩坑之z-index | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,14 +18,10 @@
 
 
 
-    <meta name="description" content="
-把Action Types单独写入一个文件
-单独出来的原因：
-
-
-这些Types如果不统一管理，不利于大型项目的服用，设置会长生冗余代码。
-因为Action里的Type，一定要和Reducer里的type一一对应在，所以这部分代码或字母写..." />
-    <meta name="keywords" content="redux" />
+    <meta name="description" content="z-index 属性指定一个元素的堆叠顺序
+拥有更高堆叠顺序的元素总是会处于堆叠顺序较低的元素的前面
+注意！！！： z-index 只适用于已定位的元素(position:absolute, position:relative, or po..." />
+    <meta name="keywords" content="css" />
   </head>
   <body>
     <div id="app" class="main">
@@ -96,72 +92,21 @@
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">redux小技巧</h2>
-            <div class="post-date">2020-05-10</div>
+            <h2 class="post-title">css踩坑之z-index</h2>
+            <div class="post-date">2020-05-11</div>
             
             <div class="post-content" v-pre>
-              <ol>
-<li>把Action Types单独写入一个文件<br>
-单独出来的原因：</li>
-</ol>
-<ul>
-<li>这些Types如果不统一管理，不利于大型项目的服用，设置会长生冗余代码。</li>
-<li>因为Action里的Type，一定要和Reducer里的type一一对应在，所以这部分代码或字母写错后，浏览器里并没有明确的报错，这给调试带来了极大的困难。</li>
-</ul>
-<p>例：</p>
-<pre><code class="language-js">// 导出 目录：src/store/actionTypes.js
-export const  CHANGE_INPUT = 'changeInput'
-export const  ADD_ITEM = 'addItem'
-export const  DELETE_ITEM = 'deleteItem'
-
-// 引入
-import { CHANGE_INPUT , ADD_ITEM , DELETE_ITEM } from './store/actionTypes'
-</code></pre>
-<ol start="2">
-<li>把所有的Redux Action放到一个文件里进行管理</li>
-</ol>
-<p>例：</p>
-<pre><code>// 目录：src/store/actionCreators.js
-import {CHANGE_INPUT}  from './actionTypes'
-
-export const changeInputAction = (value)=&gt;({
-    type:CHANGE_INPUT,
-    value
-})
-// 引入
-import {changeInputAction} from './store/actionCreatores'
-changeInputValue(e){
-    const action = changeInputAction(e.target.value)
-    store.dispatch(action)
-}
-</code></pre>
-<ol start="3">
-<li>redux三个小坑</li>
-</ol>
-<ul>
-<li>store必须是唯一的，多个store是坚决不允许，只能有一个store空间</li>
-<li>只有store能改变自己的内容，Reducer不能改变</li>
-<li>Reducer必须是纯函数</li>
-</ul>
-<p><strong>纯函数定义</strong></p>
-<blockquote>
-<p>如果函数的调用参数相同，则永远返回相同的结果。它不依赖于程序执行期间函数外部任何状态或数据的变化，必须只依赖于其输入参数。</p>
-</blockquote>
-<p>比如在Reducer里增加一个异步ajax函数，获取一些后端接口数据，然后再返回，这就是不允许的（包括你使用日期函数也是不允许的），因为违反了调用参数相同，返回相同的纯函数规则</p>
-<ol start="4">
-<li>可选的好方式</li>
-</ol>
-<ul>
-<li>UI和业务逻辑分离</li>
-<li>无状s态组件</li>
-</ul>
+              <p>z-index 属性指定一个元素的堆叠顺序<br>
+拥有更高堆叠顺序的元素总是会处于堆叠顺序较低的元素的前面</p>
+<p><mark>注意！！！： z-index 只适用于已定位的元素(position:absolute, position:relative, or position:fixed)</mark></p>
+<p>所以z-index是一种依赖属性，依赖position属性</p>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://xiayun.im/tag/redux/" class="tag">
-                    redux
+                  <a href="https://xiayun.im/tag/css/" class="tag">
+                    css
                   </a>
                 
               </div>
@@ -169,9 +114,9 @@ changeInputValue(e){
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://xiayun.im/post/tp5-nigix-404/">
+                <a href="https://xiayun.im/post/redux-and-flux/">
                   <h3 class="post-title">
-                    ThinkPHP5+宝塔+nginx环境下访问路由出现404问题
+                    Redux和Flux
                   </h3>
                 </a>
               </div>
