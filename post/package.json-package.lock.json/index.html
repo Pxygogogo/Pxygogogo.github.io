@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>http | 小潘的博客</title>
+<title>package.json和package-lock.json的区别 | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,11 @@
 
 
 
-    <meta name="description" content="平凡的世界">
+    <meta name="description" content="package.json:
+主要用来定义项目中需要依赖的包
+package-lock.json：
+根据官方文档，package-lock.json是生成的系统当前安装的库的具体来源和版本号，锁定版本。在 npm install时候生成一份文..." />
+    <meta name="keywords" content="node" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,43 +92,43 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: http</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://xiayun.im/post/https/">
-                  <h2 class="post-title">https详解</h2>
-                </a>
-                <div class="post-date">
-                  2020-04-08
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://xiayun.im/post/http-history/">
-                  <h2 class="post-title">http演变史</h2>
-                </a>
-                <div class="post-date">
-                  2020-04-07
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">package.json和package-lock.json的区别</h2>
+            <div class="post-date">2020-05-11</div>
+            
+            <div class="post-content" v-pre>
+              <p>package.json:</p>
+<p>主要用来定义项目中需要依赖的包</p>
+<p>package-lock.json：</p>
+<p>根据官方文档，package-lock.json是生成的系统当前安装的库的具体来源和版本号，锁定版本。在 <code>npm install</code>时候生成一份文件，用以记录当前状态下实际安装的各个npm package的具体来源和版本号。</p>
+<p>当你执行npm install的时候， node会先从package.json文件中读取所有dependencies信息，然后根据dependencies中的信息与node_modules中的模块进行对比，没有的直接下载，node是从package.json文件读取模块名称，从package-lock.json文件中获取版本号，然后进行下载或者更新。</p>
+<p>当package.json与package-lock.json都不存在，执行&quot;npm install&quot;时，node会重新生成package-lock.json文件，然后把node_modules中的模块信息全部记入package-lock.json文件，但不会生成package.json文件，此时，你可以通过&quot;npm init --yes&quot;来生成package.json文件</p>
+<p>参考：https://blog.csdn.net/u013992330/java/article/details/81110018</p>
 
-          <div class="pagination-container">
-  
-  
-</div>
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xiayun.im/tag/node/" class="tag">
+                    node
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xiayun.im/post/css-z-index/">
+                  <h3 class="post-title">
+                    css踩坑之z-index
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>
