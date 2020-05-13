@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>docker | 小潘的博客</title>
+<title>react中获取属性的问题 | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,10 @@
 
 
 
-    <meta name="description" content="平凡的世界">
+    <meta name="description" content="react 获取属性的问题，currentTarget确实是可以的，target确实是有问题的
+父节点有属性data-cc 这时候点击父节点获取属性
+正确方式是 event.currentTarget.getAttribute(“data-..." />
+    <meta name="keywords" content="react" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,28 +91,46 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: docker</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://xiayun.im/post/docker-mysql/">
-                  <h2 class="post-title">docker创建mysql数据库并导入sql文件</h2>
-                </a>
-                <div class="post-date">
-                  2020-04-23
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">react中获取属性的问题</h2>
+            <div class="post-date">2020-05-13</div>
+            
+            <div class="post-content" v-pre>
+              <p>react 获取属性的问题，currentTarget确实是可以的，target确实是有问题的</p>
+<p>父节点有属性data-cc 这时候点击父节点获取属性</p>
+<p>正确方式是 event.currentTarget.getAttribute(“data-cc”)</p>
+<p>而不是event.target.getAttribute(“data-cc”)</p>
+<p>ps:</p>
+<p>currentTarget 返回其事件监听器触发该事件的元素。 target 返回触发此事件的元素（事件的目标节点）。<br>
+react添加自定义属性必须是 data-xx 形式<br>
+最简单直白理解event.target指向引起触发事件的元素，而event.currentTarget则是事件绑定的元素</p>
+<p>关于currentTarget和target详细区别见下篇文章</p>
+<p><a href="https://blog.csdn.net/fortunegrant/article/details/83754945">原文地址</a></p>
 
-          <div class="pagination-container">
-  
-  
-</div>
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xiayun.im/tag/react/" class="tag">
+                    react
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xiayun.im/post/package.json-package.lock.json/">
+                  <h3 class="post-title">
+                    package.json和package-lock.json的区别
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>

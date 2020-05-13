@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xiayun.im</id>
     <title>小潘的博客</title>
-    <updated>2020-05-11T14:37:36.671Z</updated>
+    <updated>2020-05-13T14:13:39.999Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xiayun.im"/>
     <link rel="self" href="https://xiayun.im/atom.xml"/>
@@ -10,6 +10,24 @@
     <logo>https://xiayun.im/images/avatar.png</logo>
     <icon>https://xiayun.im/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[react中获取属性的问题]]></title>
+        <id>https://xiayun.im/post/react-get-attribute/</id>
+        <link href="https://xiayun.im/post/react-get-attribute/">
+        </link>
+        <updated>2020-05-13T14:12:40.000Z</updated>
+        <content type="html"><![CDATA[<p>react 获取属性的问题，currentTarget确实是可以的，target确实是有问题的</p>
+<p>父节点有属性data-cc 这时候点击父节点获取属性</p>
+<p>正确方式是 event.currentTarget.getAttribute(“data-cc”)</p>
+<p>而不是event.target.getAttribute(“data-cc”)</p>
+<p>ps:</p>
+<p>currentTarget 返回其事件监听器触发该事件的元素。 target 返回触发此事件的元素（事件的目标节点）。<br>
+react添加自定义属性必须是 data-xx 形式<br>
+最简单直白理解event.target指向引起触发事件的元素，而event.currentTarget则是事件绑定的元素</p>
+<p>关于currentTarget和target详细区别见下篇文章</p>
+<p><a href="https://blog.csdn.net/fortunegrant/article/details/83754945">原文地址</a></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[package.json和package-lock.json的区别]]></title>
         <id>https://xiayun.im/post/package.json-package.lock.json/</id>
@@ -315,30 +333,6 @@ px是固定的像素，一旦设置了就无法因为适应页面大小而改变
 <p><mark>em/rem</mark>：用于做响应式页面，不过我更倾向于rem，因为em不同元素的参照物不一样（都是该元素父元素），所以在计算的时候不方便，相比之下rem就只有一个参照物（html元素），这样计算起来更清晰。</p>
 <p>关于vh/vw与%区别：<br>
 vh和vw大小是相对于视口的高度和宽度，而不是父元素的，%单位是相对于包含它的最近的父元素的高度和宽度。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[zsh: no matches found不能指定版本]]></title>
-        <id>https://xiayun.im/post/tp-composer/</id>
-        <link href="https://xiayun.im/post/tp-composer/">
-        </link>
-        <updated>2020-04-16T02:55:43.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="问题">问题</h2>
-<pre><code>composer create-project topthink/think=5.0.* tp50 --prefer-dist
-</code></pre>
-<p>使用composer安装Thinkphp5.0时发生错误</p>
-<pre><code># 提示
-zsh: no matches found: think=5.0.*
-</code></pre>
-<h2 id="解决">解决</h2>
-<pre><code># 编辑
-nano ~/.zshrc
-# 添加
-setopt no_nomatch 
-# 生效
-source ~/.zshrc
-</code></pre>
-<p>再安装即可</p>
 ]]></content>
     </entry>
 </feed>
