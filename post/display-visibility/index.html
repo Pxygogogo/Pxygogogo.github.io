@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>微信小程序页面跳转的一系列注意点 | 小潘的博客</title>
+<title>display none与visibility hidden的区别 | 小潘的博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -19,18 +19,16 @@
 
 
     <meta name="description" content="
+面试题常考，以为自己足够理解，但第一次在真实场景中使用还是
+没有注意，记录之，自省！
 
-showModel 回调无法跳转除TabBar之外的页面
+联系：它们都能让元素不可见
+区别：
+其一
 
-回调中只能使用switchTab进行跳转
-
-
-
-switchTab跳转后页面不刷新
-
-
-法一：switchTab成功跳转后调用success,此时可以拿到跳转后页面的page对..." />
-    <meta name="keywords" content="微信小程序" />
+display:none 会让元素完全从渲染树中消失，渲染的时候不占据任何空间；
+visibility: ..." />
+    <meta name="keywords" content="css" />
   </head>
   <body>
     <div id="app" class="main">
@@ -101,55 +99,42 @@ switchTab跳转后页面不刷新
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">微信小程序页面跳转的一系列注意点</h2>
-            <div class="post-date">2020-02-13</div>
+            <h2 class="post-title">display none与visibility hidden的区别</h2>
+            <div class="post-date">2020-05-18</div>
             
             <div class="post-content" v-pre>
-              <ol>
-<li>
-<p>showModel 回调无法跳转除TabBar之外的页面</p>
+              <blockquote>
+<p>面试题常考，以为自己足够理解，但第一次在真实场景中使用还是<br>
+没有注意，记录之，自省！</p>
+</blockquote>
+<h2 id="联系它们都能让元素不可见">联系：它们都能让元素不可见</h2>
+<h2 id="区别">区别：</h2>
+<h3 id="其一">其一</h3>
 <ul>
-<li>回调中只能使用switchTab进行跳转</li>
+<li>display:none 会让元素完全从渲染树中消失，渲染的时候不占据任何空间；</li>
+<li>visibility: hidden;不会让元素从渲染树消失，渲染时元素继续占据空间，只是内容不可见</li>
 </ul>
-</li>
-<li>
-<p>switchTab跳转后页面不刷新</p>
+<h3 id="其二">其二</h3>
 <ul>
-<li>
-<p>法一：switchTab成功跳转后调用success,此时可以拿到跳转后页面的page对象,从而调用页面onLoad方法重载页面</p>
-<pre><code class="language-javascript">wx.switchTab({
-    url: '/pages/index/index',
-    success: function(e) {
-        let page = getCurrentPages().pop();
-        if (page == undefined || page == null) return;
-        page.onLoad();
-    }
-})
-</code></pre>
-</li>
-<li>
-<p>法二：当switchTab点击过的时候，只有第一次加载数据，第二次点击的时候是不刷新数据的，这个时候只要在需要每次点击都需要刷新数据的TabBar页的js里加上onShow的方法即可</p>
-<pre><code class="language-javascript"> onShow:function(e){
-       this.onLoad();
- },
-</code></pre>
-</li>
+<li>visibility:hidden; 使用该属性后，HTML元素（对象）仅仅是在视觉上看不见（完全透明），而它所占据的空间位置仍然存在，也即是说它仍具有高度、宽度等属性值。</li>
+<li>display:none; 使用该属性后，HTML元素（对象）的权度、高度等各种属性值都将“丢失”。</li>
 </ul>
-</li>
-<li>
-<p>TabBar页面只能使用switchTab跳转</p>
+<h3 id="其三">其三</h3>
 <ul>
-<li>文档里有写，使用时需注意</li>
+<li>display: none;是非继承属性，子孙节点消失由于元素从渲染树消失造成，通过修改子孙节点属性无法显示；</li>
+<li>visibility: hidden;是继承属性，子孙节点消失由于继承了hidden，通过设置visibility: visible;可以让子孙节点显示</li>
 </ul>
-</li>
-</ol>
+<h3 id="其四">其四</h3>
+<p>修改常规流中元素的display通常会造成文档重排。修改visibility属性只会造成本元素的重绘。</p>
+<h3 id="其五">其五</h3>
+<p>读屏器不会读取display: none;元素内容,会读取visibility: hidden;元素内容</p>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://xiayun.im/tag/wechatmini/" class="tag">
-                    微信小程序
+                  <a href="https://xiayun.im/tag/css/" class="tag">
+                    css
                   </a>
                 
               </div>
@@ -157,9 +142,9 @@ switchTab跳转后页面不刷新
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://xiayun.im/post/js-unique-arr/">
+                <a href="https://xiayun.im/post/react-get-attribute/">
                   <h3 class="post-title">
-                    js数组去重
+                    react中获取属性的问题
                   </h3>
                 </a>
               </div>
