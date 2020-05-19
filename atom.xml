@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xiayun.im</id>
     <title>小潘的博客</title>
-    <updated>2020-05-18T14:32:33.202Z</updated>
+    <updated>2020-05-19T14:40:50.262Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xiayun.im"/>
     <link rel="self" href="https://xiayun.im/atom.xml"/>
@@ -10,6 +10,87 @@
     <logo>https://xiayun.im/images/avatar.png</logo>
     <icon>https://xiayun.im/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[react setState修改嵌套对象]]></title>
+        <id>https://xiayun.im/post/react-setstate-complex-datastruct/</id>
+        <link href="https://xiayun.im/post/react-setstate-complex-datastruct/">
+        </link>
+        <updated>2020-05-19T14:39:52.000Z</updated>
+        <content type="html"><![CDATA[<p>在开发过程中,时常会在state中遇到一些比较复杂的数据结构,类似下面这样的:</p>
+<pre><code class="language-js">state = {
+     list: {
+        objA: {
+          name: 'A',
+          age: 20
+        },
+        objB: {
+          name: 'B',
+          age: 25
+        },
+        objC: {
+          show: false
+        },
+        objD: 'D'
+      }
+}
+</code></pre>
+<p>这时需要我们修改list中objA中的name属性和objD的属性,遇到这样的情况我们一般会使用什么办法解决呢?其实有三种解决方案:</p>
+<h3 id="方案一作用于对象中的深层级和第一层级">方案一(作用于对象中的深层级和第一层级):</h3>
+<pre><code class="language-js">this.setState({
+     list: {
+         ...this.state.list,
+          objA: {
+            ...this.state.list.objA,
+            name: 'A1'
+            }
+        }
+    })
+</code></pre>
+<h3 id="方案二作用对象中的第一层级">方案二(作用对象中的第一层级):</h3>
+<pre><code class="language-js">    let data = Object.assign({}, this.state.list, {objD: 'D1'})
+    this.setState({
+        list: data
+    })
+</code></pre>
+<h3 id="方案三作用于对象中的深层级和第一层级">方案三(作用于对象中的深层级和第一层级):</h3>
+<pre><code class="language-js">    let data = this.state.list;
+    data.objA.name = 'A1';
+    data.objD = 'D1';
+    this.setState({
+        list: data
+    })
+</code></pre>
+<p>总结:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">方案</th>
+<th style="text-align:center">适用范围</th>
+<th style="text-align:center">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">方案一</td>
+<td style="text-align:center">多层级和单一层级都存在</td>
+<td style="text-align:center">写法麻烦,单次对象赋值,对象层级多的时候,容易遗漏</td>
+</tr>
+<tr>
+<td style="text-align:center">方案二</td>
+<td style="text-align:center">只适用与第一层级</td>
+<td style="text-align:center">只适用第一层级</td>
+</tr>
+<tr>
+<td style="text-align:center">方案三</td>
+<td style="text-align:center">多层级和单一层级都存在</td>
+<td style="text-align:center">若存在深层及和单一层级的,需要多次赋值</td>
+</tr>
+</tbody>
+</table>
+<p>这三种写法都可以,使用哪一种方案,还需要根据业务来定</p>
+<p><a href="https://blog.csdn.net/weixin_34191845/article/details/89596546?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.nonecase&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.nonecase">原文链接</a></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[react复制内容到剪切板]]></title>
         <id>https://xiayun.im/post/copy-to-clipboard/</id>
@@ -315,57 +396,6 @@ changeInputValue(e){
 	}
 }
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[docker创建mysql数据库并导入sql文件]]></title>
-        <id>https://xiayun.im/post/docker-mysql/</id>
-        <link href="https://xiayun.im/post/docker-mysql/">
-        </link>
-        <updated>2020-04-23T14:08:49.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="1安装mysql">1.安装mysql</h2>
-<h3 id="11-拉取镜像以5726为例">1.1 拉取镜像（以5.7.26为例）</h3>
-<pre><code>docker pull mysql:5.7.26
-</code></pre>
-<h3 id="12-运行容器">1.2 运行容器</h3>
-<pre><code>docker run -itd --name mysql-test -p 3307:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql
-</code></pre>
-<p>参数说明：</p>
-<ul>
-<li>-p 3307:3306 ：映射容器服务的 3307 端口到宿主机的 3306 端口，外部主机可以直接通过 宿主机ip:3307 访问到 MySQL 的服务。</li>
-<li>MYSQL_ROOT_PASSWORD=123456：设置 MySQL 服务 root 用户的密码。</li>
-</ul>
-<h2 id="2docker操作mysql创建数据库">2.docker操作mysql创建数据库</h2>
-<h3 id="21-确定linux中的docker容器mysql正常运行">2.1 确定linux中的docker容器（mysql）正常运行</h3>
-<h3 id="22-执行命令docker-exec-it-容器名称-bash-进入容器bash-即进入到mysql容器中">2.2 执行命令：“docker exec -it 容器名称 bash” 进入容器bash-即进入到mysql容器中</h3>
-<h3 id="23-登录mysqlmysql-uroot-p-使用root账号登录mysql">2.3 登录mysql：mysql -uroot -p      使用root账号登录mysql</h3>
-<h3 id="24-页面提示输入密码数据root-账号所属密码登录到mysql中">2.4 页面提示输入密码——数据root 账号所属密码，登录到mysql中</h3>
-<h3 id="25-create-database-数据库名称-命令创建新数据库">2.5 create database 数据库名称  命令创建新数据库；</h3>
-<blockquote>
-<p>注：所有的mysql命名末尾一定要加“;”<br>
-mysql基本命令：</p>
-<p>-h数据库主机<br>
--u用户<br>
--p密码<br>
--P端口号（大写P）</p>
-<p>例如：mysql -h127.0.0.1 -uroot -p123456 -P3306<br>
-PS:-p密码部分，可以直接指定密码，如果不指定，会提示输入密码。</p>
-</blockquote>
-<h2 id="3将准备好的sql文件导入到docker中的mysql中">3.将准备好的sql文件导入到docker中的mysql中</h2>
-<h3 id="31-备份sql文件存储目录">3.1 备份sql文件存储目录</h3>
-<pre><code>/data
-</code></pre>
-<h3 id="32-查看当前mysql容器名称">3.2 查看当前mysql容器名称</h3>
-<pre><code>docker ps
-</code></pre>
-<h3 id="33-将sql导入mysql">3.3 将sql导入mysql</h3>
-<pre><code>docker exec -i mysql5.7 mysql -uroot -p123456 mydb &lt; /data/mydb.sql
-</code></pre>
-<blockquote>
-<p>注：</p>
-<p>mydb 为：数据库名</p>
-<p>mysql5.7 为：容器名</p>
-</blockquote>
 ]]></content>
     </entry>
 </feed>

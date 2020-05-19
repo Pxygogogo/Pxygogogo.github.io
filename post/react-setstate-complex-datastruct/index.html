@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>react setState修改嵌套对象 | 小潘的博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1589899245956">
+<link rel="stylesheet" href="https://xiayun.im/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="在开发过程中,时常会在state中遇到一些比较复杂的数据结构,类似下面这样的:
+state = {
+     list: {
+        objA: {
+          name: 'A',
+          age: 20
+  ..." />
+    <meta name="keywords" content="react" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xiayun.im">
+        <img src="https://xiayun.im/images/avatar.png?v=1589899245956" class="site-logo">
+        <h1 class="site-title">小潘的博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      平凡的世界
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://xiayun.im/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">react setState修改嵌套对象</h2>
+            <div class="post-date">2020-05-19</div>
+            
+            <div class="post-content" v-pre>
+              <p>在开发过程中,时常会在state中遇到一些比较复杂的数据结构,类似下面这样的:</p>
+<pre><code class="language-js">state = {
+     list: {
+        objA: {
+          name: 'A',
+          age: 20
+        },
+        objB: {
+          name: 'B',
+          age: 25
+        },
+        objC: {
+          show: false
+        },
+        objD: 'D'
+      }
+}
+</code></pre>
+<p>这时需要我们修改list中objA中的name属性和objD的属性,遇到这样的情况我们一般会使用什么办法解决呢?其实有三种解决方案:</p>
+<h3 id="方案一作用于对象中的深层级和第一层级">方案一(作用于对象中的深层级和第一层级):</h3>
+<pre><code class="language-js">this.setState({
+     list: {
+         ...this.state.list,
+          objA: {
+            ...this.state.list.objA,
+            name: 'A1'
+            }
+        }
+    })
+</code></pre>
+<h3 id="方案二作用对象中的第一层级">方案二(作用对象中的第一层级):</h3>
+<pre><code class="language-js">    let data = Object.assign({}, this.state.list, {objD: 'D1'})
+    this.setState({
+        list: data
+    })
+</code></pre>
+<h3 id="方案三作用于对象中的深层级和第一层级">方案三(作用于对象中的深层级和第一层级):</h3>
+<pre><code class="language-js">    let data = this.state.list;
+    data.objA.name = 'A1';
+    data.objD = 'D1';
+    this.setState({
+        list: data
+    })
+</code></pre>
+<p>总结:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">方案</th>
+<th style="text-align:center">适用范围</th>
+<th style="text-align:center">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">方案一</td>
+<td style="text-align:center">多层级和单一层级都存在</td>
+<td style="text-align:center">写法麻烦,单次对象赋值,对象层级多的时候,容易遗漏</td>
+</tr>
+<tr>
+<td style="text-align:center">方案二</td>
+<td style="text-align:center">只适用与第一层级</td>
+<td style="text-align:center">只适用第一层级</td>
+</tr>
+<tr>
+<td style="text-align:center">方案三</td>
+<td style="text-align:center">多层级和单一层级都存在</td>
+<td style="text-align:center">若存在深层及和单一层级的,需要多次赋值</td>
+</tr>
+</tbody>
+</table>
+<p>这三种写法都可以,使用哪一种方案,还需要根据业务来定</p>
+<p><a href="https://blog.csdn.net/weixin_34191845/article/details/89596546?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.nonecase&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.nonecase">原文链接</a></p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xiayun.im/tag/react/" class="tag">
+                    react
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xiayun.im/post/copy-to-clipboard/">
+                  <h3 class="post-title">
+                    react复制内容到剪切板
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
