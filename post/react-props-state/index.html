@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>react中通过props给子组件传值，父组件setState后props不能同步更新的问题 | 小潘的博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1589986177431">
+<link rel="stylesheet" href="https://xiayun.im/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="一、业务场景
+父组件给子组件一个数据列表后，增删改都在子组件中进行
+实现思路：父组件将数据列表以props的形式传递给子组件，子组件将这个props赋值给自身的state，之后的增删改就更新自身的state值，以实现局部刷新。
+二、一个de..." />
+    <meta name="keywords" content="react" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xiayun.im">
+        <img src="https://xiayun.im/images/avatar.png?v=1589986177431" class="site-logo">
+        <h1 class="site-title">小潘的博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      平凡的世界
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://xiayun.im/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">react中通过props给子组件传值，父组件setState后props不能同步更新的问题</h2>
+            <div class="post-date">2020-05-20</div>
+            
+            <div class="post-content" v-pre>
+              <p>一、业务场景</p>
+<p>父组件给子组件一个数据列表后，增删改都在子组件中进行</p>
+<p>实现思路：父组件将数据列表以props的形式传递给子组件，子组件将这个props赋值给自身的state，之后的增删改就更新自身的state值，以实现局部刷新。</p>
+<p>二、一个demo实现</p>
+<p><mark>强烈推荐使用codesandbox.io进行demo操作</mark></p>
+<pre><code class="language-js">import { render } from 'react-dom'
+import React from 'react'
+
+class Child extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      list: props.list
+    }
+  }
+
+  handleCilck = () =&gt; {
+    this.setState({
+      list: this.state.list.concat({ name: 'sarah' })
+    })
+  }
+
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;button onClick={this.handleCilck}&gt;添加&lt;/button&gt;
+        {this.state.list.map((item, index) =&gt; {
+          return &lt;h1 key={index}&gt;Hello, {item.name}&lt;/h1&gt;
+        })}
+      &lt;/div&gt;
+    )
+  }
+}
+
+class Parent extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      list: [{ name: 'lily' }, { name: 'bob' }]
+    }
+  }
+
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;Child list={this.state.list} /&gt;;
+      &lt;/div&gt;
+    )
+  }
+}
+
+render(&lt;Parent /&gt;, document.getElementById('root'))
+</code></pre>
+<p><strong>这个demo会产生一个问题，如果父组件传递给子组件的props改变了，子组件渲染的列表数据却不会对应发生改变。</strong></p>
+<p>原因：父组件更新导致子组件更新时，子组件的生命周期执行顺序如下：</p>
+<pre><code class="language-js">componentWillReceiveProps(UNSAFE_componentWillReceiveProps) 
+// componentWillReceiveProps is deprecated since React 16.9.0, use UNSAFE_componentWillReceiveProps instead
+shouldComponentUpdate
+componentWillUpdate
+render
+componentDidUpdate
+</code></pre>
+<p><mark><strong>也就是说子组件刷新的时候，父组件传递给子组件的props发生改变，引发子组件的render，并没有执行子组件的constructor函数，子组件没有被卸载自然不会重新加载，只会重新render，而如果父组件的props传递给子组件的state，那么子组件的state只会在第一次加载的时候被赋值，后续的父组件props变化并不会被赋值到子组件的state上，还是要理解组件的声明周期函数，以及各个函数在什么时候会被调用。</strong></mark></p>
+<p>解决方案：在UNSAFE_componentWillReceiveProps中重新对state赋值。</p>
+<pre><code class="language-js">UNSAFE_componentWillReceiveProps(nextProps) {
+    this.setState({
+      list: nextProps.list
+    })
+}
+
+</code></pre>
+<p>接着给子组件添加修改功能</p>
+<p>js部分:</p>
+<pre><code class="language-js">handleModify = () =&gt; {
+    let newArray = this.state.list
+    newArray[0].name = 'natasha'
+    this.setState({
+      list: newArray
+    })
+  }
+</code></pre>
+<p>jsx部分:</p>
+<pre><code class="language-html">&lt;button onClick={this.handleAdd}&gt;添加&lt;/button&gt;
+</code></pre>
+<p>如果直接这样做又会引发一个新的问题</p>
+<p>因为list是引用类型，这样更改的话，不仅更改了子组件自身的state，还更改了父组件传递进来的props，也就是父组件的state.list的值。</p>
+<p>因此在更改引用类型的数据时，应该采用浅拷贝或者深拷贝的方式</p>
+<p>三、总结</p>
+<p>总结以上demo实践，父组件用props赋值给子组件的state时，需要注意两点：</p>
+<p>1.在生命周期UNSAFE_componentWillReceiveProps中重新赋值</p>
+<p>2.用深拷贝创建不可变类型引用数据</p>
+<blockquote>
+<p>react官方文档讲的挺好</p>
+<p>参考资料：</p>
+<p><a href="https://www.azimiao.com/6316.html">文章一</a></p>
+<p><a href="https://www.jianshu.com/p/19c4dc3394f0">文章二</a></p>
+<p><a href="https://segmentfault.com/q/1010000008387645">文章三</a></p>
+<p><a href="https://blog.csdn.net/RuiKe1400360107/article/details/89554600">文章四</a></p>
+</blockquote>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xiayun.im/tag/react/" class="tag">
+                    react
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xiayun.im/post/react-setstate-complex-datastruct/">
+                  <h3 class="post-title">
+                    react setState修改嵌套对象
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
