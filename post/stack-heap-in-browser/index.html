@@ -1,106 +1,103 @@
 <html>
-<head>
-    <meta charset="utf-8"/>
-<meta name="description" content=""/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>浏览器中堆栈内存的底层处理 | 小潘的博客</title>
-<link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1589987288839">
-<link href="https://cdn.bootcss.com/font-awesome/5.11.2/css/all.css" rel="stylesheet">
+<link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1589987521854">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://xiayun.im/styles/main.css">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
-<script src="https://cdn.bootcss.com/highlight.js/9.15.10/highlight.min.js"></script>
-<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dockerfile.min.js"></script>
-<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/dart.min.js"></script>
-<script src="https://cdn.bootcss.com/highlight.js/9.15.10/languages/go.min.js"></script>
-<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
-
-<!-- DEMO JS -->
-<!--<script src="media/scripts/index.js"></script>-->
+<link rel="alternate" type="application/atom+xml" title="浏览器中堆栈内存的底层处理 | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
+    <meta name="description" content="浏览器执行代码需要经历什么
+编译
+
+词法解析：这个过程会将由字符组成的字符串分解成有意义的代码块（词法单元）
+语法分析：这个过程将词法单元流转换成一个由元素逐级嵌套所组成的代表了程序语法的树（抽象语法树 =&gt; AST）
+代码生成：将A..." />
+    <meta name="keywords" content="js" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
-</head>
-<body>
-<div class="main gt-bg-theme-color-first">
-    <nav class="navbar navbar-expand-lg">
-    <div class="navbar-brand">
-        <img class="user-avatar" src="/images/avatar.png" alt="头像">
-        <div class="site-name gt-c-content-color-first">
-            小潘的博客
-        </div>
-    </div>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <i class="fas fa-bars gt-c-content-color-first" style="font-size: 18px"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <div class="navbar-nav mr-auto" style="text-align: center">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://xiayun.im">
+  <img class="avatar" src="https://xiayun.im/images/avatar.png?v=1589987521854" alt="">
+  </a>
+  <h1 class="site-title">
+    小潘的博客
+  </h1>
+  <p class="site-description">
+    平凡的世界
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              浏览器中堆栈内存的底层处理
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-03-13
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://xiayun.im/tag/js/" class="post-tag">
+                  # js
+                </a>
+              
+            </div>
             
-                <div class="nav-item">
-                    
-                        <a href="/" class="menu gt-a-link">
-                            首页
-                        </a>
-                    
-                </div>
-            
-                <div class="nav-item">
-                    
-                        <a href="/archives" class="menu gt-a-link">
-                            归档
-                        </a>
-                    
-                </div>
-            
-                <div class="nav-item">
-                    
-                        <a href="/tags" class="menu gt-a-link">
-                            标签
-                        </a>
-                    
-                </div>
-            
-                <div class="nav-item">
-                    
-                        <a href="/post/about" class="menu gt-a-link">
-                            关于
-                        </a>
-                    
-                </div>
-            
-        </div>
-    </div>
-</nav>
-    <div class="post-container">
-        <div class="post-detail gt-bg-theme-color-second">
-            <article class="gt-post-content">
-                <h2 class="post-title">
-                    浏览器中堆栈内存的底层处理
-                </h2>
-                <div class="post-info">
-                    <time class="post-time gt-c-content-color-first">
-                        · 2020-03-13 ·
-                    </time>
-                    
-                        <a href="https://xiayun.im/tag/js/" class="post-tags">
-                            # js
-                        </a>
-                    
-                </div>
-                <div class="post-content">
-                    <h2 id="浏览器执行代码需要经历什么">浏览器执行代码需要经历什么</h2>
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="浏览器执行代码需要经历什么">浏览器执行代码需要经历什么</h2>
 <h3 id="编译">编译</h3>
 <ul>
 <li>词法解析：这个过程会将由字符组成的字符串分解成有意义的代码块（词法单元）</li>
@@ -245,54 +242,95 @@ console.log(x, y);
 </ul>
 <p><mark>[3, 4, 'C'] [3, 4, 'C'] [1, 2, 'A'] [3, 4, 'C']</mark></p>
 
-                </div>
-            </article>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E6%89%A7%E8%A1%8C%E4%BB%A3%E7%A0%81%E9%9C%80%E8%A6%81%E7%BB%8F%E5%8E%86%E4%BB%80%E4%B9%88">浏览器执行代码需要经历什么</a>
+<ul>
+<li><a href="#%E7%BC%96%E8%AF%91">编译</a></li>
+<li><a href="#%E5%BC%95%E6%93%8E%E7%BC%96%E8%AF%91%E6%89%A7%E8%A1%8C%E4%BB%A3%E7%A0%81">引擎编译执行代码</a>
+<ul>
+<li><a href="#%E5%87%A0%E4%B8%AA%E6%9C%AF%E8%AF%AD%E8%AF%B4%E6%98%8E">几个术语说明：</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8F%98%E9%87%8F%E8%B5%8B%E5%80%BC%E7%9A%84%E4%B8%89%E6%AD%A5%E6%93%8D%E4%BD%9C">变量赋值的三步操作</a></li>
+<li><a href="#%E7%9C%9F%E5%AE%9E%E9%9D%A2%E8%AF%95%E9%A2%98">真实面试题</a></li>
+<li><a href="#%E6%80%9D%E8%80%83%E9%A2%98">思考题</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
         </div>
 
         
-            <div class="next-post">
-                <div class="next gt-c-content-color-first">下一篇</div>
-                <a href="https://xiayun.im/post/mongoose-query/" class="post-title gt-a-link">
-                    Mongoose得到的对象不能增加属性解决方法（两种）
-                </a>
-            </div>
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://xiayun.im/post/mongoose-query/">
+              <h3 class="post-title">
+                Mongoose得到的对象不能增加属性解决方法（两种）
+              </h3>
+            </a>
+          </div>
         
 
         
-		
-		
 
-        <div class="site-footer gt-c-content-color-first">
-    <div class="slogan gt-c-content-color-first">平凡的世界</div>
-    <div class="social-container">
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-    </div>
-    <div class="footer-info">
-        Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
-    </div>
-    <div>
-        Theme by <a href="https://imhanjie.com/" target="_blank">imhanjie</a>, Powered by <a
-                href="https://github.com/getgridea/gridea" target="_blank">Gridea | <a href="https://xiayun.im/atom.xml" target="_blank">RSS</a></a>
-    </div>
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://xiayun.im/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
 </div>
 
-<script>
-    hljs.initHighlightingOnLoad()
-</script>
-
+      </div>
     </div>
-</div>
-</body>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
 </html>
