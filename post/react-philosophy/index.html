@@ -1,0 +1,218 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>React哲学 | 小潘的博客</title>
+<link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1592397749115">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://xiayun.im/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="React哲学 | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="第一步：将设计好的 UI 划分为组件层级
+如何确定应该将哪些部分划分到一个组件中呢？你可以将组件当作一种函数或者是对象来考虑，根据单一功能原则来判定组件的范围。也就是说，一个组件原则上只能负责一个功能。如果它需要负责更多的功能，这时候就应该..." />
+    <meta name="keywords" content="react" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://xiayun.im">
+  <img class="avatar" src="https://xiayun.im/images/avatar.png?v=1592397749115" alt="">
+  </a>
+  <h1 class="site-title">
+    小潘的博客
+  </h1>
+  <p class="site-description">
+    平凡的世界
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Pxygogogo" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              React哲学
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-06-17
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://xiayun.im/tag/react/" class="post-tag">
+                  # react
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="第一步将设计好的-ui-划分为组件层级">第一步：将设计好的 UI 划分为组件层级</h2>
+<p>如何确定应该将哪些部分划分到一个组件中呢？你可以将组件当作一种函数或者是对象来考虑，根据单一功能原则来判定组件的范围。也就是说，一个组件原则上只能负责一个功能。如果它需要负责更多的功能，这时候就应该考虑将它拆分成更小的组件。</p>
+<h2 id="第二步用-react-创建一个静态版本">第二步：用 React 创建一个静态版本</h2>
+<p>现在我们已经确定了组件层级，可以编写对应的应用了。最容易的方式，是先用已有的数据模型渲染一个不包含交互功能的 UI。最好将渲染 UI 和添加交互这两个过程分开。这是因为，编写一个应用的静态版本时，往往要编写大量代码，而不需要考虑太多交互细节；添加交互功能时则要考虑大量细节，而不需要编写太多代码。所以，将这两个过程分开进行更为合适。</p>
+<p>在构建应用的静态版本时，我们需要创建一些会重用其他组件的组件，然后通过 props 传入所需的数据。props 是父组件向子组件传递数据的方式。即使你已经熟悉了 state 的概念，也完全不应该使用 state 构建静态版本。state 代表了随时间会产生变化的数据，应当仅在实现交互时使用。所以构建应用的静态版本时，你不会用到它。</p>
+<p>你可以自上而下或者自下而上构建应用：自上而下意味着首先编写层级较高的组件，自下而上意味着从最基本的组件开始编写。当你的应用比较简单时，使用自上而下的方式更方便；对于较为大型的项目来说，自下而上地构建，并同时为低层组件编写测试是更加简单的方式。</p>
+<blockquote>
+<p>单向数据流</p>
+<p>不管是父组件或是子组件都无法知道某个组件是有状态的还是无状态的，并且它们也并不关心它是函数组件还是 class 组件。</p>
+<p>这就是为什么称 state 为局部的或是封装的的原因。除了拥有并设置了它的组件，其他组件都无法访问。</p>
+<p>组件可以选择把它的 state 作为 props 向下传递到它的子组件中</p>
+<p>这通常会被叫做“自上而下”或是“单向”的数据流。任何的 state 总是所属于特定的组件，而且从该 state 派生的任何数据或 UI 只能影响树中“低于”它们的组件</p>
+</blockquote>
+<h2 id="第三步确定-ui-state-的最小且完整表示">第三步：确定 UI state 的最小（且完整）表示</h2>
+<p>为了正确地构建应用，你首先需要找出应用所需的 state 的最小表示，并根据需要计算出其他所有数据。其中的关键正是 <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY: Don’t Repeat Yourself</a>。只保留应用所需的可变 state 的最小集合，其他数据均由它们计算产生。比如，你要编写一个任务清单应用，你只需要保存一个包含所有事项的数组，而无需额外保存一个单独的 state 变量（用于存储任务个数）。当你需要展示任务个数时，只需要利用该数组的 length 属性即可。</p>
+<p>通过问自己以下三个问题，你可以逐个检查相应数据是否属于 state：</p>
+<ol>
+<li>该数据是否是由父组件通过 props 传递而来的？如果是，那它应该不是 state。</li>
+<li>该数据是否随时间的推移而保持不变？如果是，那它应该也不是 state。</li>
+<li>你能否根据其他 state 或 props 计算出该数据的值？如果是，那它也不是 state。</li>
+</ol>
+<h2 id="第四步确定-state-放置的位置">第四步：确定 state 放置的位置</h2>
+<p>我们已经确定了应用所需的 state 的最小集合。接下来，我们需要确定哪个组件能够改变这些 state，或者说拥有这些 state。</p>
+<p>对于应用中的每一个 state：</p>
+<ol>
+<li>找到根据这个 state 进行渲染的所有组件。</li>
+<li>找到他们的共同所有者（common owner）组件（在组件层级上高于所有需要该 state 的组件）。</li>
+<li>该共同所有者组件或者比它层级更高的组件应该拥有该 state。</li>
+<li>如果你找不到一个合适的位置来存放该 state，就可以直接创建一个新的组件来存放该 state，并将这一新组件置于高于共同所有者组件层级的位置。</li>
+</ol>
+<h2 id="第五步添加反向数据流">第五步：添加反向数据流</h2>
+<p>React 通过一种比传统的双向绑定略微繁琐的方法来实现反向数据传递。尽管如此，但这种需要显式声明的方法更有助于人们理解程序的运作方式。</p>
+<p>本文由react官方文档整理而得</p>
+<p><a href="https://zh-hans.reactjs.org/docs/thinking-in-react.html">原文链接</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%E5%B0%86%E8%AE%BE%E8%AE%A1%E5%A5%BD%E7%9A%84-ui-%E5%88%92%E5%88%86%E4%B8%BA%E7%BB%84%E4%BB%B6%E5%B1%82%E7%BA%A7">第一步：将设计好的 UI 划分为组件层级</a></li>
+<li><a href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%E7%94%A8-react-%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%9D%99%E6%80%81%E7%89%88%E6%9C%AC">第二步：用 React 创建一个静态版本</a></li>
+<li><a href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%E7%A1%AE%E5%AE%9A-ui-state-%E7%9A%84%E6%9C%80%E5%B0%8F%E4%B8%94%E5%AE%8C%E6%95%B4%E8%A1%A8%E7%A4%BA">第三步：确定 UI state 的最小（且完整）表示</a></li>
+<li><a href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%E7%A1%AE%E5%AE%9A-state-%E6%94%BE%E7%BD%AE%E7%9A%84%E4%BD%8D%E7%BD%AE">第四步：确定 state 放置的位置</a></li>
+<li><a href="#%E7%AC%AC%E4%BA%94%E6%AD%A5%E6%B7%BB%E5%8A%A0%E5%8F%8D%E5%90%91%E6%95%B0%E6%8D%AE%E6%B5%81">第五步：添加反向数据流</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://xiayun.im/post/react-zhe-xue/">
+              <h3 class="post-title">
+                React哲学
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://xiayun.im/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

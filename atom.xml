@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xiayun.im</id>
     <title>小潘的博客</title>
-    <updated>2020-06-07T05:02:39.455Z</updated>
+    <updated>2020-06-17T12:42:31.459Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xiayun.im"/>
     <link rel="self" href="https://xiayun.im/atom.xml"/>
@@ -10,6 +10,90 @@
     <logo>https://xiayun.im/images/avatar.png</logo>
     <icon>https://xiayun.im/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[React哲学]]></title>
+        <id>https://xiayun.im/post/react-philosophy/</id>
+        <link href="https://xiayun.im/post/react-philosophy/">
+        </link>
+        <updated>2020-06-17T12:41:34.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="第一步将设计好的-ui-划分为组件层级">第一步：将设计好的 UI 划分为组件层级</h2>
+<p>如何确定应该将哪些部分划分到一个组件中呢？你可以将组件当作一种函数或者是对象来考虑，根据单一功能原则来判定组件的范围。也就是说，一个组件原则上只能负责一个功能。如果它需要负责更多的功能，这时候就应该考虑将它拆分成更小的组件。</p>
+<h2 id="第二步用-react-创建一个静态版本">第二步：用 React 创建一个静态版本</h2>
+<p>现在我们已经确定了组件层级，可以编写对应的应用了。最容易的方式，是先用已有的数据模型渲染一个不包含交互功能的 UI。最好将渲染 UI 和添加交互这两个过程分开。这是因为，编写一个应用的静态版本时，往往要编写大量代码，而不需要考虑太多交互细节；添加交互功能时则要考虑大量细节，而不需要编写太多代码。所以，将这两个过程分开进行更为合适。</p>
+<p>在构建应用的静态版本时，我们需要创建一些会重用其他组件的组件，然后通过 props 传入所需的数据。props 是父组件向子组件传递数据的方式。即使你已经熟悉了 state 的概念，也完全不应该使用 state 构建静态版本。state 代表了随时间会产生变化的数据，应当仅在实现交互时使用。所以构建应用的静态版本时，你不会用到它。</p>
+<p>你可以自上而下或者自下而上构建应用：自上而下意味着首先编写层级较高的组件，自下而上意味着从最基本的组件开始编写。当你的应用比较简单时，使用自上而下的方式更方便；对于较为大型的项目来说，自下而上地构建，并同时为低层组件编写测试是更加简单的方式。</p>
+<blockquote>
+<p>单向数据流</p>
+<p>不管是父组件或是子组件都无法知道某个组件是有状态的还是无状态的，并且它们也并不关心它是函数组件还是 class 组件。</p>
+<p>这就是为什么称 state 为局部的或是封装的的原因。除了拥有并设置了它的组件，其他组件都无法访问。</p>
+<p>组件可以选择把它的 state 作为 props 向下传递到它的子组件中</p>
+<p>这通常会被叫做“自上而下”或是“单向”的数据流。任何的 state 总是所属于特定的组件，而且从该 state 派生的任何数据或 UI 只能影响树中“低于”它们的组件</p>
+</blockquote>
+<h2 id="第三步确定-ui-state-的最小且完整表示">第三步：确定 UI state 的最小（且完整）表示</h2>
+<p>为了正确地构建应用，你首先需要找出应用所需的 state 的最小表示，并根据需要计算出其他所有数据。其中的关键正是 <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY: Don’t Repeat Yourself</a>。只保留应用所需的可变 state 的最小集合，其他数据均由它们计算产生。比如，你要编写一个任务清单应用，你只需要保存一个包含所有事项的数组，而无需额外保存一个单独的 state 变量（用于存储任务个数）。当你需要展示任务个数时，只需要利用该数组的 length 属性即可。</p>
+<p>通过问自己以下三个问题，你可以逐个检查相应数据是否属于 state：</p>
+<ol>
+<li>该数据是否是由父组件通过 props 传递而来的？如果是，那它应该不是 state。</li>
+<li>该数据是否随时间的推移而保持不变？如果是，那它应该也不是 state。</li>
+<li>你能否根据其他 state 或 props 计算出该数据的值？如果是，那它也不是 state。</li>
+</ol>
+<h2 id="第四步确定-state-放置的位置">第四步：确定 state 放置的位置</h2>
+<p>我们已经确定了应用所需的 state 的最小集合。接下来，我们需要确定哪个组件能够改变这些 state，或者说拥有这些 state。</p>
+<p>对于应用中的每一个 state：</p>
+<ol>
+<li>找到根据这个 state 进行渲染的所有组件。</li>
+<li>找到他们的共同所有者（common owner）组件（在组件层级上高于所有需要该 state 的组件）。</li>
+<li>该共同所有者组件或者比它层级更高的组件应该拥有该 state。</li>
+<li>如果你找不到一个合适的位置来存放该 state，就可以直接创建一个新的组件来存放该 state，并将这一新组件置于高于共同所有者组件层级的位置。</li>
+</ol>
+<h2 id="第五步添加反向数据流">第五步：添加反向数据流</h2>
+<p>React 通过一种比传统的双向绑定略微繁琐的方法来实现反向数据传递。尽管如此，但这种需要显式声明的方法更有助于人们理解程序的运作方式。</p>
+<p>本文由react官方文档整理而得</p>
+<p><a href="https://zh-hans.reactjs.org/docs/thinking-in-react.html">原文链接</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[React哲学]]></title>
+        <id>https://xiayun.im/post/react-zhe-xue/</id>
+        <link href="https://xiayun.im/post/react-zhe-xue/">
+        </link>
+        <updated>2020-06-17T12:41:34.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="第一步将设计好的-ui-划分为组件层级">第一步：将设计好的 UI 划分为组件层级</h2>
+<p>如何确定应该将哪些部分划分到一个组件中呢？你可以将组件当作一种函数或者是对象来考虑，根据单一功能原则来判定组件的范围。也就是说，一个组件原则上只能负责一个功能。如果它需要负责更多的功能，这时候就应该考虑将它拆分成更小的组件。</p>
+<h2 id="第二步用-react-创建一个静态版本">第二步：用 React 创建一个静态版本</h2>
+<p>现在我们已经确定了组件层级，可以编写对应的应用了。最容易的方式，是先用已有的数据模型渲染一个不包含交互功能的 UI。最好将渲染 UI 和添加交互这两个过程分开。这是因为，编写一个应用的静态版本时，往往要编写大量代码，而不需要考虑太多交互细节；添加交互功能时则要考虑大量细节，而不需要编写太多代码。所以，将这两个过程分开进行更为合适。</p>
+<p>在构建应用的静态版本时，我们需要创建一些会重用其他组件的组件，然后通过 props 传入所需的数据。props 是父组件向子组件传递数据的方式。即使你已经熟悉了 state 的概念，也完全不应该使用 state 构建静态版本。state 代表了随时间会产生变化的数据，应当仅在实现交互时使用。所以构建应用的静态版本时，你不会用到它。</p>
+<p>你可以自上而下或者自下而上构建应用：自上而下意味着首先编写层级较高的组件，自下而上意味着从最基本的组件开始编写。当你的应用比较简单时，使用自上而下的方式更方便；对于较为大型的项目来说，自下而上地构建，并同时为低层组件编写测试是更加简单的方式。</p>
+<blockquote>
+<p>单向数据流</p>
+<p>不管是父组件或是子组件都无法知道某个组件是有状态的还是无状态的，并且它们也并不关心它是函数组件还是 class 组件。</p>
+<p>这就是为什么称 state 为局部的或是封装的的原因。除了拥有并设置了它的组件，其他组件都无法访问。</p>
+<p>组件可以选择把它的 state 作为 props 向下传递到它的子组件中</p>
+<p>这通常会被叫做“自上而下”或是“单向”的数据流。任何的 state 总是所属于特定的组件，而且从该 state 派生的任何数据或 UI 只能影响树中“低于”它们的组件</p>
+</blockquote>
+<h2 id="第三步确定-ui-state-的最小且完整表示">第三步：确定 UI state 的最小（且完整）表示</h2>
+<p>为了正确地构建应用，你首先需要找出应用所需的 state 的最小表示，并根据需要计算出其他所有数据。其中的关键正是 <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY: Don’t Repeat Yourself</a>。只保留应用所需的可变 state 的最小集合，其他数据均由它们计算产生。比如，你要编写一个任务清单应用，你只需要保存一个包含所有事项的数组，而无需额外保存一个单独的 state 变量（用于存储任务个数）。当你需要展示任务个数时，只需要利用该数组的 length 属性即可。</p>
+<p>通过问自己以下三个问题，你可以逐个检查相应数据是否属于 state：</p>
+<ol>
+<li>该数据是否是由父组件通过 props 传递而来的？如果是，那它应该不是 state。</li>
+<li>该数据是否随时间的推移而保持不变？如果是，那它应该也不是 state。</li>
+<li>你能否根据其他 state 或 props 计算出该数据的值？如果是，那它也不是 state。</li>
+</ol>
+<h2 id="第四步确定-state-放置的位置">第四步：确定 state 放置的位置</h2>
+<p>我们已经确定了应用所需的 state 的最小集合。接下来，我们需要确定哪个组件能够改变这些 state，或者说拥有这些 state。</p>
+<p>对于应用中的每一个 state：</p>
+<ol>
+<li>找到根据这个 state 进行渲染的所有组件。</li>
+<li>找到他们的共同所有者（common owner）组件（在组件层级上高于所有需要该 state 的组件）。</li>
+<li>该共同所有者组件或者比它层级更高的组件应该拥有该 state。</li>
+<li>如果你找不到一个合适的位置来存放该 state，就可以直接创建一个新的组件来存放该 state，并将这一新组件置于高于共同所有者组件层级的位置。</li>
+</ol>
+<h2 id="第五步添加反向数据流">第五步：添加反向数据流</h2>
+<p>React 通过一种比传统的双向绑定略微繁琐的方法来实现反向数据传递。尽管如此，但这种需要显式声明的方法更有助于人们理解程序的运作方式。</p>
+<p>本文由react官方文档整理而得</p>
+<p><a href="https://zh-hans.reactjs.org/docs/thinking-in-react.html">原文链接</a></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[你喜欢哪种朋友——余光中]]></title>
         <id>https://xiayun.im/post/friends/</id>
@@ -370,60 +454,6 @@ react添加自定义属性必须是 data-xx 形式<br>
 <p>当你执行npm install的时候， node会先从package.json文件中读取所有dependencies信息，然后根据dependencies中的信息与node_modules中的模块进行对比，没有的直接下载，node是从package.json文件读取模块名称，从package-lock.json文件中获取版本号，然后进行下载或者更新。</p>
 <p>当package.json与package-lock.json都不存在，执行&quot;npm install&quot;时，node会重新生成package-lock.json文件，然后把node_modules中的模块信息全部记入package-lock.json文件，但不会生成package.json文件，此时，你可以通过&quot;npm init --yes&quot;来生成package.json文件</p>
 <p>参考：https://blog.csdn.net/u013992330/java/article/details/81110018</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[css踩坑之z-index]]></title>
-        <id>https://xiayun.im/post/css-z-index/</id>
-        <link href="https://xiayun.im/post/css-z-index/">
-        </link>
-        <updated>2020-05-11T14:36:28.000Z</updated>
-        <content type="html"><![CDATA[<p>z-index 属性指定一个元素的堆叠顺序<br>
-拥有更高堆叠顺序的元素总是会处于堆叠顺序较低的元素的前面</p>
-<p><mark>注意！！！： z-index 只适用于已定位的元素(position:absolute, position:relative, or position:fixed)</mark></p>
-<p>所以z-index是一种依赖属性，依赖position属性</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Redux和Flux]]></title>
-        <id>https://xiayun.im/post/redux-and-flux/</id>
-        <link href="https://xiayun.im/post/redux-and-flux/">
-        </link>
-        <updated>2020-05-11T14:35:38.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="flux">Flux</h2>
-<h3 id="flux-优点">Flux 优点</h3>
-<ul>
-<li><strong>最重要的就是“<mark>单向数据流</mark>”的管理方式</strong>。在Flux的理念里，如果要改变界面，必须改变Store中的状态，如果要改变Store中的状态，必须派发一个action对象，这就是规矩。在这个规矩之下，想要追溯一个应用的逻辑就变得非常容易。</li>
-</ul>
-<p>解决的MVC的问题:</p>
-<blockquote>
-<p>MVC最大的问题就是无法禁绝View和Model之间的直接对话，对应于MVC中View就是Flux中的View，对应于MVC中的Model的就是Flux中的Store，在Flux中，Store只有get方法，没有set方法，根本可能直接去修改其内部状态，View只能通过get方法获取Store的状态，无法直接去修改状态，如果View想要修改Store状态的话，只有派发一个action对象给Dispatcher</p>
-</blockquote>
-<h3 id="flux-不足">Flux 不足</h3>
-<ol>
-<li>Store之间依赖关系</li>
-<li>难以进行服务器端渲染</li>
-<li>Store混杂了逻辑和状态</li>
-</ol>
-<h2 id="redux">Redux</h2>
-<p>2013年问世的Flux饱受争议，而2015年Dan Abramov提出了在Flux基础上的改进框架Redux，则是一鸣惊人，在所有Flux的变体中算是最受关注的框架，没有之一。</p>
-<p>Flux的基本原则是“单向数据流”,</p>
-<p>Redux在此基础上强调三个基本原则：</p>
-<ul>
-<li>唯一数据源（Single Source of Truth）；</li>
-</ul>
-<p>唯一数据源指的是应用的状态数据应该只存储在唯一的一个Store上。这个唯一Store上的状态，是一个树形的对象，每个组件往往只是用树形对象上一部分的数据，而如何设计Store上状态的结构，就是Redux应用的核心问题</p>
-<ul>
-<li>保持状态只读（State is read-only）；</li>
-</ul>
-<p>保持状态只读，就是说不能去直接修改状态，要修改Store的状态，必须要通过派发一个action对象完成，这一点，和Flux的要求并没有什么区别。</p>
-<ul>
-<li>数据改变只能通过纯函数完成（Changes are made with pure functions）。</li>
-</ul>
-<p>这里所说的纯函数就是Reducer, Redux这个名字的前三个字母Red代表的就是Reducer。按照创作者Dan Abramov的说法，Redux名字的含义是Reducer+Flux。Reducer不是一个Redux特定的术语，而是一个计算机科学中的通用概念，很多语言和框架都有对Reducer函数的支持。就以JavaScript为例，数组类型就有reduce函数，接受的参数就是一个reducer, reduce做的事情就是把数组所有元素依次做“规约”，对每个元素都调用一次参数reducer，通过reducer函数完成规约所有元素的功能.</p>
-<blockquote>
-<p>Redux是Flux框架的一个巨大改进，Redux强调单一数据源、保持状态只读和数据改变只能通过纯函数完成的基本原则，和React的UI=render(state)思想完全契合</p>
-</blockquote>
 ]]></content>
     </entry>
 </feed>
