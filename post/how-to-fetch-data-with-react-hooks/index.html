@@ -2,22 +2,18 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>typeof 和 instance | 小潘的博客</title>
+<title>How to fetch data with React Hooks（转） | 小潘的博客</title>
 <link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1592748719325">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://xiayun.im/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="typeof 和 instance | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="How to fetch data with React Hooks（转） | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-    <meta name="description" content="typeof
-typeof 对于基本类型，除了 null都可以显示正确的类型
-typeof 1 // 'number'
-typeof '1' // 'string'
-typeof undefined // 'undefined'
-typeo..." />
-    <meta name="keywords" content="js" />
+    <meta name="description" content="How to fetch data with React Hooks？
+" />
+    <meta name="keywords" content="react" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
@@ -83,80 +79,29 @@ typeo..." />
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              typeof 和 instance
+              How to fetch data with React Hooks（转）
             </h2>
             <div class="post-info">
               <span>
-                2020-03-28
+                2020-06-21
               </span>
               <span>
                 1 min read
               </span>
               
-                <a href="https://xiayun.im/tag/js/" class="post-tag">
-                  # js
+                <a href="https://xiayun.im/tag/react/" class="post-tag">
+                  # react
                 </a>
               
             </div>
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <h2 id="typeof">typeof</h2>
-<h3 id="typeof-对于基本类型除了-null都可以显示正确的类型">typeof 对于基本类型，除了 null都可以显示正确的类型</h3>
-<pre><code class="language-js">typeof 1 // 'number'
-typeof '1' // 'string'
-typeof undefined // 'undefined'
-typeof true // 'boolean'
-typeof Symbol() // 'symbol'
-typeof b // b 没有声明，但是还会显示 undefined
-</code></pre>
-<h3 id="typeof-对于对象除了函数都会显示-object">typeof 对于对象，除了函数都会显示 object</h3>
-<pre><code class="language-js">typeof [] // 'object'
-typeof {} // 'object'
-typeof console.log // 'function'
-</code></pre>
-<p>对于 null 来说，虽然它是基本类型，但是会显示 object，这是一个存在很久了的 Bug</p>
-<pre><code class="language-js">typeof null // 'object'
-</code></pre>
-<h2 id="instanceof">instanceof</h2>
-<h3 id="instanceof-可以正确的判断对象的类型因为内部机制是通过判断对象的原型链中是不是能找到类型的-prototype">instanceof 可以正确的判断对象的类型，因为内部机制是通过判断对象的原型链中是不是能找到类型的 prototype</h3>
-<pre><code class="language-js">试着实现一下 instanceof
-function instanceof(left, right) {
-    // 获得类型的原型
-    let prototype = right.prototype
-    // 获得对象的原型
-    left = left.__proto__
-    // 判断对象的类型是否等于类型的原型
-    while (true) {
-    	if (left === null)
-    		return false
-    	if (prototype === left)
-    		return true
-    	left = left.__proto__
-    }
-}
-</code></pre>
+                <p>How to fetch data with React Hooks？</p>
 
               </div>
               <div class="toc-container">
-                <ul class="markdownIt-TOC">
-<li>
-<ul>
-<li><a href="#typeof">typeof</a>
-<ul>
-<li><a href="#typeof-%E5%AF%B9%E4%BA%8E%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E9%99%A4%E4%BA%86-null%E9%83%BD%E5%8F%AF%E4%BB%A5%E6%98%BE%E7%A4%BA%E6%AD%A3%E7%A1%AE%E7%9A%84%E7%B1%BB%E5%9E%8B">typeof 对于基本类型，除了 null都可以显示正确的类型</a></li>
-<li><a href="#typeof-%E5%AF%B9%E4%BA%8E%E5%AF%B9%E8%B1%A1%E9%99%A4%E4%BA%86%E5%87%BD%E6%95%B0%E9%83%BD%E4%BC%9A%E6%98%BE%E7%A4%BA-object">typeof 对于对象，除了函数都会显示 object</a></li>
-</ul>
-</li>
-<li><a href="#instanceof">instanceof</a>
-<ul>
-<li><a href="#instanceof-%E5%8F%AF%E4%BB%A5%E6%AD%A3%E7%A1%AE%E7%9A%84%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E7%9A%84%E7%B1%BB%E5%9E%8B%E5%9B%A0%E4%B8%BA%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E6%98%AF%E9%80%9A%E8%BF%87%E5%88%A4%E6%96%AD%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%8E%9F%E5%9E%8B%E9%93%BE%E4%B8%AD%E6%98%AF%E4%B8%8D%E6%98%AF%E8%83%BD%E6%89%BE%E5%88%B0%E7%B1%BB%E5%9E%8B%E7%9A%84-prototype">instanceof 可以正确的判断对象的类型，因为内部机制是通过判断对象的原型链中是不是能找到类型的 prototype</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
+                
               </div>
             </div>
           </article>
@@ -165,9 +110,9 @@ function instanceof(left, right) {
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://xiayun.im/post/js-properrty/">
+            <a href="https://xiayun.im/post/react-philosophy/">
               <h3 class="post-title">
-                属性设置和屏蔽
+                React哲学
               </h3>
             </a>
           </div>

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xiayun.im</id>
     <title>小潘的博客</title>
-    <updated>2020-06-18T15:17:18.955Z</updated>
+    <updated>2020-06-21T14:12:06.451Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xiayun.im"/>
     <link rel="self" href="https://xiayun.im/atom.xml"/>
@@ -10,6 +10,15 @@
     <logo>https://xiayun.im/images/avatar.png</logo>
     <icon>https://xiayun.im/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[How to fetch data with React Hooks（转）]]></title>
+        <id>https://xiayun.im/post/how-to-fetch-data-with-react-hooks/</id>
+        <link href="https://xiayun.im/post/how-to-fetch-data-with-react-hooks/">
+        </link>
+        <updated>2020-06-21T14:11:32.000Z</updated>
+        <content type="html"><![CDATA[<p>How to fetch data with React Hooks？</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[React哲学]]></title>
         <id>https://xiayun.im/post/react-philosophy/</id>
@@ -412,18 +421,6 @@ react添加自定义属性必须是 data-xx 形式<br>
 <p>当你执行npm install的时候， node会先从package.json文件中读取所有dependencies信息，然后根据dependencies中的信息与node_modules中的模块进行对比，没有的直接下载，node是从package.json文件读取模块名称，从package-lock.json文件中获取版本号，然后进行下载或者更新。</p>
 <p>当package.json与package-lock.json都不存在，执行&quot;npm install&quot;时，node会重新生成package-lock.json文件，然后把node_modules中的模块信息全部记入package-lock.json文件，但不会生成package.json文件，此时，你可以通过&quot;npm init --yes&quot;来生成package.json文件</p>
 <p>参考：https://blog.csdn.net/u013992330/java/article/details/81110018</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[css踩坑之z-index]]></title>
-        <id>https://xiayun.im/post/css-z-index/</id>
-        <link href="https://xiayun.im/post/css-z-index/">
-        </link>
-        <updated>2020-05-11T14:36:28.000Z</updated>
-        <content type="html"><![CDATA[<p>z-index 属性指定一个元素的堆叠顺序<br>
-拥有更高堆叠顺序的元素总是会处于堆叠顺序较低的元素的前面</p>
-<p><mark>注意！！！： z-index 只适用于已定位的元素(position:absolute, position:relative, or position:fixed)</mark></p>
-<p>所以z-index是一种依赖属性，依赖position属性</p>
 ]]></content>
     </entry>
 </feed>
