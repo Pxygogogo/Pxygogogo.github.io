@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xiayun.im</id>
     <title>小潘的博客</title>
-    <updated>2020-06-28T15:53:32.960Z</updated>
+    <updated>2020-06-28T15:57:39.415Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xiayun.im"/>
     <link rel="self" href="https://xiayun.im/atom.xml"/>
@@ -11,7 +11,7 @@
     <icon>https://xiayun.im/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
     <entry>
-        <title type="html"><![CDATA[git从已有分支拉取新分支.md]]></title>
+        <title type="html"><![CDATA[git从已有分支拉取新分支]]></title>
         <id>https://xiayun.im/post/git-branch/</id>
         <link href="https://xiayun.im/post/git-branch/">
         </link>

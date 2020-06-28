@@ -1,5 +1,5 @@
 ---
-title: 'git从已有分支拉取新分支.md'
+title: 'git从已有分支拉取新分支'
 date: 2020-06-28 23:38:30
 tags: [git]
 published: true
