@@ -1,0 +1,312 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>React Hooks之每一次渲染都有它自己的effects | 小潘的博客</title>
+<link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1593359345310">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://xiayun.im/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="React Hooks之每一次渲染都有它自己的effects | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="React Hooks之每一次渲染都有它自己的effects
+同样通过一个例子来说明：
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  useEffect(()..." />
+    <meta name="keywords" content="react" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://xiayun.im">
+  <img class="avatar" src="https://xiayun.im/images/avatar.png?v=1593359345310" alt="">
+  </a>
+  <h1 class="site-title">
+    小潘的博客
+  </h1>
+  <p class="site-description">
+    平凡的世界
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Pxygogogo" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              React Hooks之每一次渲染都有它自己的effects
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-06-10
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://xiayun.im/tag/react/" class="post-tag">
+                  # react
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h3 id="react-hooks之每一次渲染都有它自己的effects">React Hooks之每一次渲染都有它自己的effects</h3>
+<p>同样通过一个例子来说明：</p>
+<pre><code class="language-js">function Counter() {
+  const [count, setCount] = useState(0)
+
+  useEffect(() =&gt; {
+    setTimeout(() =&gt; {
+      console.log(`You clicked ${count} times`)
+    }, 3000)
+  })
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;You clicked {count} times&lt;/p&gt;
+      &lt;button onClick={() =&gt; setCount(count + 1)}&gt;
+        Click me
+      &lt;/button&gt;
+    &lt;/div&gt;
+  )
+}
+</code></pre>
+<p>点击 3 次按钮：</p>
+<p>分析：<br>
+整个过程组件进行了四次渲染：</p>
+<blockquote>
+<p>初始化，render0：打印 You clicked 0 times；</p>
+<p>修改 count 值为1，render1：打印 You clicked 1 times；</p>
+<p>修改 count 值为2，render2：打印 You clicked 2 times；</p>
+<p>修改 count 值为3，render3：打印 You clicked 3 times；</p>
+<p>通过整个例子我们可以知道，在每次渲染中，useEffect 也是独立的。</p>
+</blockquote>
+<p>并不是count的值在“不变”的effect中发生了改变，而是effect 函数本身在每一次渲染中都不相同。</p>
+<p>每一个effect版本“看到”的count值都来自于它属于的那次渲染：</p>
+<pre><code class="language-js">// During first render
+function Counter() {
+  // ...
+  useEffect(
+    // Effect function from first render
+    setTimeout(() =&gt; {
+      console.log(`You clicked ${0} times`)
+    }, 3000)
+  );
+  // ...
+}
+
+// After a click, our function is called again
+function Counter() {
+  // ...
+  useEffect(
+    // Effect function from second render
+    setTimeout(() =&gt; {
+      console.log(`You clicked ${1} times`)
+    }, 3000)
+  );
+  // ...
+}
+
+// After another click, our function is called again
+function Counter() {
+  // ...
+  useEffect(
+    // Effect function from third render
+    setTimeout(() =&gt; {
+      console.log(`You clicked ${2} times`)
+    }, 3000)
+  );
+  // ..
+}
+
+// After another click, our function is called again
+function Counter() {
+  // ...
+  useEffect(
+    // Effect function from forth render
+    setTimeout(() =&gt; {
+      console.log(`You clicked ${3} times`)
+    }, 3000)
+  );
+  // ..
+}
+
+</code></pre>
+<h3 id="清除-effect">清除 effect</h3>
+<p>在 React class 中，你通常会在 componentDidMount 中设置订阅，并在 componentWillUnmount 中清除它。当我们在 useEffect 中使用了定时器或者添加了某些订阅，可以通过 useEffect 返回一个函数，进行清除定时器或者取消订阅等操作。</p>
+<p>看一下例子，在 useEffect 中打印点击的次数：</p>
+<pre><code class="language-js">function Example() {
+  const [count, setCount] = useState(0)
+
+  useEffect(() =&gt; {
+    console.log(`You clicked ${count} times`)
+    return() =&gt; {
+      console.log('销毁')
+    }
+  })
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;You clicked {count} times&lt;/p&gt;
+      &lt;button onClick={() =&gt; setCount(count + 1)}&gt;
+        Click me
+      &lt;/button&gt;
+    &lt;/div&gt;
+  )
+
+</code></pre>
+<p>点击按钮 3 次，控制台中打印的结果如下：</p>
+<p>You clicked 0 times<br>
+销毁<br>
+You clicked 1 times<br>
+销毁<br>
+You clicked 2 times<br>
+销毁<br>
+You clicked 3 times</p>
+<p>从打印结果我们可以很容易看出，上一次的 effect 是在重新渲染时被清除的。</p>
+<p>补充：那么组件的整个重新渲染的过程是怎么样的呢？<br>
+假设现在有 render0 和 render1 两次渲染：</p>
+<p>React 渲染 render1 的UI;<br>
+浏览器绘制，并呈现 render1 的UI；<br>
+React 清除 render0 的 effect；<br>
+React 运行 render1 的 effect；</p>
+<blockquote>
+<p>React 只会在浏览器绘制后运行effects。这使得你的应用更流畅因为大多数effects并不会阻塞屏幕的更新。</p>
+</blockquote>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#react-hooks%E4%B9%8B%E6%AF%8F%E4%B8%80%E6%AC%A1%E6%B8%B2%E6%9F%93%E9%83%BD%E6%9C%89%E5%AE%83%E8%87%AA%E5%B7%B1%E7%9A%84effects">React Hooks之每一次渲染都有它自己的effects</a></li>
+<li><a href="#%E6%B8%85%E9%99%A4-effect">清除 effect</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://xiayun.im/post/react-hooks/">
+              <h3 class="post-title">
+                React Hooks之每一次渲染都有它自己的 Props and State和事件处理函数
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://xiayun.im/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
