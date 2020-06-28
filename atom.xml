@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xiayun.im</id>
     <title>小潘的博客</title>
-    <updated>2020-06-28T15:50:26.119Z</updated>
+    <updated>2020-06-28T15:53:32.960Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xiayun.im"/>
     <link rel="self" href="https://xiayun.im/atom.xml"/>
@@ -117,6 +117,67 @@ git branch --set-upstream-to=origin/&lt;branch&gt; dev
 <p>React 通过一种比传统的双向绑定略微繁琐的方法来实现反向数据传递。尽管如此，但这种需要显式声明的方法更有助于人们理解程序的运作方式。</p>
 <p>本文由react官方文档整理而得</p>
 <p><a href="https://zh-hans.reactjs.org/docs/thinking-in-react.html">原文链接</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[React Hooks之在比对中执行effects]]></title>
+        <id>https://xiayun.im/post/react-hooks-excute-effects/</id>
+        <link href="https://xiayun.im/post/react-hooks-excute-effects/">
+        </link>
+        <updated>2020-06-11T04:50:34.000Z</updated>
+        <content type="html"><![CDATA[<p>React 针对 React Elements 前后值进行对比，只去更新 DOM 真正发生改变的部分。对于 Effects，能否有类似这样的理念呢？</p>
+<p>某个 Effects 函数一旦执行，函数内的副作用已经发生，React 无法猜测到函数相比于上一次做了哪些变化。但我们可以给 useEffect 传入第二个参数，作为依赖数组 (deps)，避免 Effects 不必要的重复调用。<br>
+这个 deps 的含义是：当前 Effect 依赖了哪些变量。</p>
+<p>实际应用中，我们不需要在每次组件更新时，都去执行某些 effects，这个时候我们可以给 useEffect 设置依赖，告诉 React 什么时候去执行 useEffect</p>
+<p>但有时问题不一定能解决。比如官网就有<a href="https://zh-hans.reactjs.org/docs/hooks-faq.html#what-can-i-do-if-my-effect-dependencies-change-too-often"> 这样的例子:</a></p>
+<pre><code class="language-jsx">const [count, setCount] = useState(0);
+
+useEffect(() =&gt; {
+    const id = setInterval(() =&gt; {
+        setCount(count + 1);
+    }, 1000);
+    return () =&gt; clearInterval(id);
+}, [count]);
+
+
+</code></pre>
+<p>如果我们频繁修改 count，每次执行 Effect，上一次的计时器被清除，需要调用 setInterval 重新进入时间队列，实际的定期时间被延后，甚至有可能根本没有机会被执行。</p>
+<p>但是下面这样的实践方式也不宜采用：</p>
+<p>在 Effect 函数中寻找一些变量添加到 deps 中，需要满足条件：其变化时，需要重新触发 effect。</p>
+<p>按照这种实践方式，count 变化时，我们并不希望重新 setInterval，故 deps 为空数组。这意味着该 hook 只在组件挂载时运行一次。Effect 中明明依赖了 count，但我们撒谎说它没有依赖，那么当 setInterval 回调函数执行时，获取到的 count 值永远为 0。</p>
+<p>遇到这种问题，直接从 deps 移除是不可行的。静下来分析一下，此处为什么要用到 count？能否避免对其直接使用？</p>
+<p>可以看到，在 setCount 中用到了 count，为的是把 count 转换为 count + 1 ，然后返回给 React。React 其实已经知道当前的 count，我们需要告知 React 的仅仅是去递增状态，不管它现在具体是什么值。</p>
+<p>所以有一个最佳实践：状态变更时，应该通过 setState 的函数形式来代替直接获取当前状态。</p>
+<pre><code>setCount(c =&gt; c + 1);
+</code></pre>
+<p>另外一种场景是：</p>
+<pre><code class="language-jsx">const [count, setCount] = useState(0);
+
+useEffect(() =&gt; {
+    const id = setInterval(() =&gt; {
+        console.log(count);
+    }, 1000);
+    return () =&gt; clearInterval(id);
+}, []);
+</code></pre>
+<p>复制代码在这里，同样的，当count 变化时，我们并不希望重新 setInterval。但我们可以把 count 通过 ref 保存起来。</p>
+<pre><code class="language-jsx">const [count, setCount] = useState(0);
+const countRef = useRef();
+countRef.current = count;
+
+useEffect(() =&gt; {
+    const id = setInterval(() =&gt; {
+        console.log(countRef.current);
+    }, 1000);
+    return () =&gt; clearInterval(id);
+}, []);
+</code></pre>
+<p>复制代码这样，count 的确不再被使用，而是用 ref 存储了一个在所有帧中共享的变量。</p>
+<p>另外的情况是，Effects 依赖了函数或者其他引用类型。与原始数据类型不同的是，在未优化的情况下，每次 render 函数调用时，因为对这些内容的重新创建，其值总是发生了变化，导致 Effects 在使用 deps 的情况下依然会频繁被调用。</p>
+<p>对于这个问题，<a href="https://zh-hans.reactjs.org/docs/hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies">官网的 FAQ </a>已经给出了答案：对于函数，使用 useCallback 避免重复创建；对于对象或者数组，则可以使用 useMemo。从而减少 deps 的变化。</p>
+<blockquote>
+<p><a href="https://juejin.im/post/5ec7372cf265da76de5cd0c9">原文链接</a></p>
+</blockquote>
 ]]></content>
     </entry>
     <entry>
@@ -567,68 +628,6 @@ componentDidUpdate
 </table>
 <p>这三种写法都可以,使用哪一种方案,还需要根据业务来定</p>
 <p><a href="https://blog.csdn.net/weixin_34191845/article/details/89596546?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.nonecase&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-2.nonecase">原文链接</a></p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[react复制内容到剪切板]]></title>
-        <id>https://xiayun.im/post/copy-to-clipboard/</id>
-        <link href="https://xiayun.im/post/copy-to-clipboard/">
-        </link>
-        <updated>2020-05-18T14:31:43.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="react-copy-to-clipboard插件">react-copy-to-clipboard插件</h3>
-<p>一个react插件，npm安装即可。<br>
-优点：查看官方示例，上手简单，兼容性扩展性会比较强<br>
-缺点：截止发文，最新版5.0.2版包大小达到了37.2kb，对于一个在项目中使用不多的需求有些浪费。</p>
-<h3 id="原生js实现">原生js实现</h3>
-<h4 id="documentexeccommand方法">document.execCommand()方法</h4>
-<p><a href="hhttps://developer.mozilla.org/zh-CN/docs/Web/API/Document/execCommand">MDN上定义：</a></p>
-<p>当一个HTML文档切换到设计模式时，document暴露 execCommand 方法，该方法允许运行命令来操纵<mark>可编辑内容区域</mark>的元素。</p>
-<p>再看可编辑内容区域（contenteditable）的定义</p>
-<p>全局属性 contenteditable  是一个枚举属性，表示元素是否可被用户编辑。 如果可以，浏览器会修改元素的部件以允许编辑。</p>
-<p>也就是意味着除了 <mark><input>、<textarea></mark> 这样的输入域以外，是无法使用这个方法的</p>
-<p>如果是需要获取input和textarea的值然后复制的，可以直接通过获取元素节点后通过select方法选中后直接调用document.execCommand('copy')即可</p>
-<p>样例：</p>
-<pre><code class="language-js">    const btn = document.querySelector('#btn');
-    btn.addEventListener('click',() =&gt; {
-        const input = document.createElement('input');
-        input.setAttribute('readonly', 'readonly');
-        input.setAttribute('value', 'hello world!');
-        document.body.appendChild(input);
-        input.select();
-        if (document.execCommand('copy')) {
-            document.execCommand('copy');
-            console.log('复制成功');
-        }
-        document.body.removeChild(input);
-    })
-</code></pre>
-<blockquote>
-<p>如果需要隐藏新创建的元素时需要注意不能通过设置display值为none来实现，因为设置为none后将无法获取元素的属性值包括value，上一篇文章仔细探讨了display：none和visibility：hidden区别</p>
-</blockquote>
-<h4 id="createtextrange">createTextRange()</h4>
-<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Range">MDN上对于range定义：</a></p>
-<p>Range 接口表示一个包含节点与文本节点的一部分的文档片段。</p>
-<p>可以用 Document 对象的 Document.createRange 方法创建 Range，也可以用 Selection 对象的 getRangeAt 方法获取 Range。另外，还可以通过 Document 对象的构造函数 Range() 来得到 Range</p>
-<p>其原理与上种方法大同小异</p>
-<p>样例：</p>
-<pre><code class="language-js">        var div = document.getElementById('div1');
-        if (document.body.createTextRange) {
-            var range = document.body.createTextRange();
-            range.moveToElementText(div);
-            range.select();
-        } else if (window.getSelection) {
-            var selection = window.getSelection();
-            var range = document.createRange();
-            range.selectNodeContents(div);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        } else {
-            console.warn(&quot;none&quot;);
-        }
-        document.execCommand(&quot;copy&quot;)
-</code></pre>
-<p><a href="https://www.cnblogs.com/dch0/p/12674129.html">参考一</a></p>
-<p><a href="https://www.jb51.net/article/135605.htm">参考二</a></p>
 ]]></content>
     </entry>
 </feed>
