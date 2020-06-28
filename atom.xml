@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xiayun.im</id>
     <title>小潘的博客</title>
-    <updated>2020-06-28T15:39:49.080Z</updated>
+    <updated>2020-06-28T15:41:23.079Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xiayun.im"/>
     <link rel="self" href="https://xiayun.im/atom.xml"/>
@@ -117,6 +117,91 @@ git branch --set-upstream-to=origin/&lt;branch&gt; dev
 <p>React 通过一种比传统的双向绑定略微繁琐的方法来实现反向数据传递。尽管如此，但这种需要显式声明的方法更有助于人们理解程序的运作方式。</p>
 <p>本文由react官方文档整理而得</p>
 <p><a href="https://zh-hans.reactjs.org/docs/thinking-in-react.html">原文链接</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[React Hooks之每一次渲染都有它自己的 Props and State和事件处理函数]]></title>
+        <id>https://xiayun.im/post/react-hooks/</id>
+        <link href="https://xiayun.im/post/react-hooks/">
+        </link>
+        <updated>2020-06-10T02:40:23.000Z</updated>
+        <content type="html"><![CDATA[<p>React Hooks之每一次渲染都有它自己的 Props and State和事件处理函数,就我个人角度，我将它简单的理解成为一个快照</p>
+<h3 id="通过一个例子来说明">通过一个例子来说明：</h3>
+<pre><code class="language-js">export default function Example(props) {
+  const [times, setTimes] = useState(0);
+  const handleClick = () =&gt; {
+    setTimeout(() =&gt; {
+      alert(`example--${props.count}`);
+      setTimes(times + 1);
+    }, 3000);
+  };
+  return (
+    &lt;&gt;
+      &lt;h1&gt;Example&lt;/h1&gt;
+      &lt;p&gt;props.count---{props.count}&lt;/p&gt;
+      &lt;p&gt;state.times---{times}&lt;/p&gt;
+      &lt;button onClick={handleClick}&gt;alert count&lt;/button&gt;
+    &lt;/&gt;
+  );
+}
+</code></pre>
+<p>重点关注 <Example> 函数组件的代码，其中的 count 属性由父组件传入，初始值为 0，每隔一秒增加 1。点击 &quot;alert count&quot; 按钮，将延迟 3 秒钟弹出 count 的值。<mark>操作后发现，弹窗中出现的值，与页面中文本展示的值不同，而是等于点击 &quot;alert Count&quot; 按钮时 count 的值</mark>。</p>
+<p>其中的times属性是组件自身的state，初始值为0，点击 &quot;alert count&quot; 按钮，将延迟 3 秒钟 + 1。如果我在3s内，多次点击按钮，最终它的值并不会是上一次的times值+点击次数*1而是上一次的times+1，这说明只要当点击事件触发时那一刻的times的值没有发生改变，那么无论你在3s内点击多少次，它都是一样的结果。</p>
+<p>其点击的快照类似如此：</p>
+<pre><code class="language-js">// 第一次点击后3s内的所有点击快照
+const handleClick = () =&gt; {
+    setTimeout(() =&gt; {
+      alert(`example--点击时的props.count`);
+      setTimes(0 + 1);
+    }, 3000);
+  };
+</code></pre>
+<p>如果更换为 class 组件，它的实现是 <Example2> 这样的：</p>
+<pre><code class="language-js">
+class Example2 extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      times: 0
+    };
+  }
+  handleClick = () =&gt; {
+    setTimeout(() =&gt; {
+      alert(`example2--${this.props.count}`);
+      this.setState({
+        times: this.state.times + 1
+      });
+    }, 3000);
+  };
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;h1&gt;Example2&lt;/h1&gt;
+        &lt;p&gt;{this.props.count}&lt;/p&gt;
+        &lt;p&gt;{this.state.times}&lt;/p&gt;
+        &lt;button onClick={this.handleClick}&gt;alert count&lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+
+</code></pre>
+<p>此时，点击 &quot;alert count&quot; 按钮，延迟 3 秒钟弹出 count 的值，与页面中文本展示的值是一样的。<br>
+在某些情况下，<Example> 函数组件中的行为才符合预期。如果将 setTimeout 类比到一次 Fetch 请求，在请求成功时，我要获取的是发起 Fetch 请求前相关的数据，并对其进行修改。</p>
+<p>其中的times属性是组件自身的state，初始值为0，点击 &quot;alert count&quot; 按钮，将延迟 3 秒钟 + 1。如果我在3s内，多次点击按钮，最终它的值始终会是上一次的times+1，与hooks组件的表现不一。</p>
+<h3 id="如何理解其中的差异">如何理解其中的差异？</h3>
+<p>在 <Example2> class 组件中，我们是从 this 中获取到的 props.count。this 是固定指向同一个组件实例的。在 3 秒的延时器生效后，组件重新进行了渲染，this.props 也发生了改变。当延时的回调函数执行时，读取到的 this.props 是当前组件最新的属性值。<br>
+而在 <Example> 函数组件中，每一次执行 render 函数时，props 作为该函数的参数传入，它是函数作用域下的变量。</p>
+<p>由于 props 是 Example 函数作用域下的变量，可以说对于这个函数的每一次调用中，都产生了新的 props 变量，它在声明时被赋予了当前的属性，他们相互间互不影响。<br>
+换一种说法，对于其中任一个 props ，其值在声明时便已经决定，不会随着时间产生变化。handleClick 函数亦是如此。例如定时器的回调函数是在未来发生的，但 props.count 的值是在声明 handleClick 函数时就已经决定好的。</p>
+<h3 id="结论">结论：</h3>
+<p>在任意一次渲染中，props和state是始终保持不变的。如果props和state在不同的渲染中是相互独立的，那么使用到它们的任何值也是独立的（包括事件处理函数）。它们都“属于”一次特定的渲染。即便是事件处理中的异步函数调用“看到”的也是这次渲染中的count值。</p>
+<p><a href="https://codesandbox.io/s/react-hookszhimeiyicixuanranduyoutazijide-props-and-stateheshijianchulihanshu-syhjb?file=/src/index.js">edit on codesandbox</a></p>
+<blockquote>
+<p>参考文章：</p>
+<p><a href="https://overreacted.io/zh-hans/a-complete-guide-to-useeffect/">useEffect 完整指南</a></p>
+<p><a href="https://juejin.im/post/5ec7372cf265da76de5cd0c9">React Hooks 最佳实践</a></p>
+</blockquote>
 ]]></content>
     </entry>
     <entry>
@@ -446,24 +531,6 @@ componentDidUpdate
 <p>修改常规流中元素的display通常会造成文档重排。修改visibility属性只会造成本元素的重绘。</p>
 <h3 id="其五">其五</h3>
 <p>读屏器不会读取display: none;元素内容,会读取visibility: hidden;元素内容</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[react中获取属性的问题]]></title>
-        <id>https://xiayun.im/post/react-get-attribute/</id>
-        <link href="https://xiayun.im/post/react-get-attribute/">
-        </link>
-        <updated>2020-05-13T14:12:40.000Z</updated>
-        <content type="html"><![CDATA[<p>react 获取属性的问题，currentTarget确实是可以的，target确实是有问题的</p>
-<p>父节点有属性data-cc 这时候点击父节点获取属性</p>
-<p>正确方式是 event.currentTarget.getAttribute(“data-cc”)</p>
-<p>而不是event.target.getAttribute(“data-cc”)</p>
-<p>ps:</p>
-<p>currentTarget 返回其事件监听器触发该事件的元素。 target 返回触发此事件的元素（事件的目标节点）。<br>
-react添加自定义属性必须是 data-xx 形式<br>
-最简单直白理解event.target指向引起触发事件的元素，而event.currentTarget则是事件绑定的元素</p>
-<p>关于currentTarget和target详细区别见下篇文章</p>
-<p><a href="https://blog.csdn.net/fortunegrant/article/details/83754945">原文地址</a></p>
 ]]></content>
     </entry>
 </feed>
