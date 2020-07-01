@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xiayun.im</id>
     <title>小潘的博客</title>
-    <updated>2020-07-01T13:51:13.892Z</updated>
+    <updated>2020-07-01T13:51:56.406Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xiayun.im"/>
     <link rel="self" href="https://xiayun.im/atom.xml"/>
@@ -421,6 +421,168 @@ class Example2 extends Component {
 ]]></content>
     </entry>
     <entry>
+        <title type="html"><![CDATA[js如何实现继承]]></title>
+        <id>https://xiayun.im/post/js-extends/</id>
+        <link href="https://xiayun.im/post/js-extends/">
+        </link>
+        <updated>2020-06-01T13:51:16.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="写在前面">写在前面</h3>
+<p>继承是OO语言中的一个最为人津津乐道的概念。许多OO语言都支持两种继承方式：接口继承和实现继承。接口继承只继承方法签名，而实现继承则继承实际的方法。如前所述，由于函数没有签名，在ECMAScript中无法实现接口继承。ECMAScript只支持实现继承，而且其实现继承主要是依靠原型链来实现的。</p>
+<h3 id="1原型链">1.原型链</h3>
+<p>在 ECMAScript 中描述了原型链的概念，并将原型链作为实现继承的主要方法。其基本思想是利用原型让一个引用类型继承另一个引用类型的属性和方法。这一部分另写一篇文章总结，在此不展开了。</p>
+<p>缺点：</p>
+<ol>
+<li>
+<p>包含引用类型的原型属性会被所有实例属性共享，容易造成属性的修改混乱。</p>
+</li>
+<li>
+<p>在创建子类型的实例时，不能向超类型的构造函数中传递参数。</p>
+</li>
+</ol>
+<p>基于以上问题，在实践中很少会单独使用原型链。</p>
+<h3 id="2借用构造函数">2.借用构造函数</h3>
+<p>借用构造函数的思想主要是在子类型的构造函数中调用父类型构造函数。</p>
+<p>例：</p>
+<pre><code class="language-js">
+function SuperType(name){
+    this.name = name;
+}
+
+function SubType(){
+    // 集成了SuperType，同时还传递了参数
+    SuperType.call(this,'pxy');
+    
+    //实例属性
+    this.age = 22;
+}
+var instance = new SubType();
+alert(instance.name); // &quot;pxy&quot;
+alert(instance.age); // 22
+
+</code></pre>
+<p>优点：可以在子类型构造函数中向超类型构造函数添加参数</p>
+<p>缺点：和构造函数模式一样的问题，所有的方法都在构造函数中定义，因此就无法做到函数的复用。而且超类型的原型中定义的方法，对于子类型而言也是不可见的。</p>
+<p>基于以上问题，借用构造函数的技术也是很少单独使用的。</p>
+<h3 id="3组合继承">3.组合继承</h3>
+<pre><code class="language-js">function SuperType(name){
+    this.name = name
+    this.colors = [&quot;red&quot;, &quot;blue&quot;, &quot;green&quot;];
+}
+
+SuperType.prototype.sayName = function(){
+    console.log(this.name);
+}
+
+function SubType(name, age){
+    
+    //继承属性
+    SuperType.call(this,name);
+
+    this.age = age;
+}
+
+//继承方法
+SubType.prototype = new SuperType();
+SubType.prototype.constructor = SubType;
+SubType.prototype.sayAge = function(){
+    console.log(this.age);
+}
+
+var instance1 = new SubType(&quot;driss&quot;,9);
+instance1.colors.push(&quot;black&quot;);
+console.log(instance1.colors);  //&quot;red,blue,green,black&quot;
+instance1.sayName(); // &quot;driss&quot;
+instance1.sayAge(); // 9
+
+var instance2 = new SubType(&quot;pan&quot;,10);
+console.log(instance2.colors);  //&quot;red,blue,green&quot;
+instance2.sayName(); // &quot;pan&quot;
+instance2.sayAge(); // 10
+</code></pre>
+<p>优点：组合继承避免了原型链和借用构造函数的缺陷，融合了它们的优点，成为 JavaScript 中最常用的继承模式。而且，instanceof 和 isPropertyOf() 也能够用于识别基于组合继承创建的对象。</p>
+<p>缺点：调用了两次超类的构造函数，导致基类的原型对象中增添了不必要的超类的实例对象中的所有属性。</p>
+<h3 id="4原型式继承">4.原型式继承</h3>
+<p>原型式继承的主要思路是可以基于已有的对象创建新的对象，同时还不必因此创建自定义类型。</p>
+<p>例:</p>
+<pre><code class="language-js">function object(o){
+    function F(){};
+    F.prototype = o;
+    return new F();
+}
+</code></pre>
+<p>简单来说这个函数的作用就是，传入一个对象，返回一个原型对象为该对象的新对象。</p>
+<pre><code class="language-js">function object(o){
+    function F(){};
+    F.prototype = o;
+    return new F();
+}
+var person = {
+    name: 'pxy',
+    friends: ['tmk','cz','cyx']
+}
+
+var anotherPerson = object(person);
+anotherPerson.name = 'whg';
+anotherPerson.friends.push('wj');
+
+var anotherPerson2 = object(person);
+anotherPerson2.name = 'zsl';
+anotherPerson2.friends.push('wdw');
+
+console.log(person.friends); //[ 'tmk', 'cz', 'pyr', 'wj', 'wdw' ]
+
+</code></pre>
+<p>这种原型式继承，要求你必须有一个对象可以作为另一个对象的基础。如果有这么一个对象的话，可以把它传递给object()函数，然后再根据具体需求对得到的对象加以修改即可。在这个例子中，可以作为另一个对象基础的是person对象，于是我们把它传入到object()函数中，然后该函数就会返回一个新对象。这个新对象将person作为原型，所以它的原型中就包含一个基本类型值属性和一个引用类型值属性。这意味着person.friends不仅属于person所有，而且也会被anotherPerson以及anotherPerson2共享。实际上，这就相当于又创建了person对象的两个副本。</p>
+<p>ECMAScript 5中新增了 Object.create() 方法规范了原型式继承。这个方法接收两个参数，一个是将被用作新对象原型的对象，一个是为新对象定义额外属性的对象（可选）。</p>
+<p>注意第二个参数的格式与 Object.defineProperties() 方法的第二个参数格式相同。以这种方式指定的任何属性都会覆盖原型对象上的同名属性。在第二个参数为空的情况下，该方法与 object() 方法的行为相同。</p>
+<p>在没有必要兴师动众地创建构造函数，而只想让一个对象与另一个对象保持类似的情况下，原型式继承是完全可以胜任的</p>
+<p>优点：可以实现基于一个对象的简单继承，不必创建构造函数</p>
+<p>缺点：与原型链中提到的缺点相同，一个是传参的问题，一个是属性共享的问题。</p>
+<h3 id="5-寄生式继承">5. 寄生式继承</h3>
+<p>寄生式继承的思路与寄生构造函数和工厂模式类似，创建一个仅用于封装继承过程的函数，该函数在内部以某种方式增强对象，最后返回这个对象。</p>
+<pre><code class="language-js">function createAnother(original){
+    
+    var clone = object(original); //通过调用函数创建一个新对象
+    
+    clone.sayHi = function(){  // 某种方式增强这个对象
+        console.log(&quot;hi&quot;);
+    }
+
+    return clone;  // 返回这个对象
+}
+
+var person = {
+    name: &quot;james&quot;
+}
+
+var anotherPerson = createAnother(person);
+
+anotherPerson.sayHi(); // &quot;hi&quot;
+
+</code></pre>
+<p>这个例子中的代码基于person返回了一个新对象——anotherPerson。新对象不仅具有person的所有属性和方法，而且还有自己的sayHi()方法</p>
+<p>优点： 在主要考虑对象而不是自定义类型和构造函数的情况下，实现简单的继承。</p>
+<p>缺点：使用该继承方式，在为对象添加函数的时候，没有办法做到函数的复用。</p>
+<h3 id="6寄生式组合继承">6.寄生式组合继承</h3>
+<p>前面说过，组合继承是JavaScript最常用的继承模式；不过，它也有自己的不足。组合继承最大的问题就是无论什么情况下，都会调用两次超类型构造函数：一次是在创建子类型原型的时候，另一次是在子类型构造函数内部。没错，子类型最终会包含超类型对象的全部实例属性，但我们不得不在调用子类型构造函数时重写这些属性。</p>
+<p>寄生式组合继承就是用来解决这个问题，它与组合继承不同的地方主要是，在继承原型时，我们继承的不是超类的实例对象，而是原型对象是超类原型对象的一个实例对象，这样就解决了基类的原型对象中增添了不必要的超类的实例对象中的所有属性的问题。</p>
+<pre><code class="language-js">function inheritPrototype(subType, superType){
+
+    var prototype = object(superType.prototype); // 创建原型对象是超类原型对象的一个实例对象
+  
+    prototype.constructor = subType; // 弥补因为重写原型而失去的默认的 constructor 属性。
+ 
+    subType.prototype = prototype; // 实现原型继承
+}
+</code></pre>
+<p>优点：效率高，避免了在 SubType.prototype 上创建不必要的属性。与此同时还能保持原型链不变，开发人员普遍认为寄生组合式继承是引用类型最理想的继承范式。</p>
+<blockquote>
+<p>参考：<br>
+JavaScript高级程序设计（第三版）</p>
+</blockquote>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[js如何创建对象]]></title>
         <id>https://xiayun.im/post/js-create-object/</id>
         <link href="https://xiayun.im/post/js-create-object/">
@@ -685,113 +847,6 @@ JavaScript高级程序设计（第三版）</p>
 <p>但是，你们的黄金时代有限，现实终于要暴露的。这是我经验过来的情形也是大人们谁也经验过的情形。我眼看见儿时的伴侣中的英雄、好汉，一个个退缩、顺从、妥协、屈服起来，到象绵羊的地步。我自己也是如此。“后之视今，亦犹今之视昔”，你们不久也要走这条路呢？</p>
 <p>我的孩子们！憧憬于你们的生活的我，痴心要为你们永远挽留这黄金时代在这册子里。</p>
 <p>然这真不过象“蜘蛛网落花”，略微保留一点春的痕迹而已。且到你们懂得我这片心情的时候，你们早已不是这样的人，我的画在世间已无可印证了！这是何等可悲哀的事啊！</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[react中通过props给子组件传值，父组件setState后props不能同步更新的问题]]></title>
-        <id>https://xiayun.im/post/react-props-state/</id>
-        <link href="https://xiayun.im/post/react-props-state/">
-        </link>
-        <updated>2020-05-20T14:48:59.000Z</updated>
-        <content type="html"><![CDATA[<p>一、业务场景</p>
-<p>父组件给子组件一个数据列表后，增删改都在子组件中进行</p>
-<p>实现思路：父组件将数据列表以props的形式传递给子组件，子组件将这个props赋值给自身的state，之后的增删改就更新自身的state值，以实现局部刷新。</p>
-<p>二、一个demo实现</p>
-<p><mark>强烈推荐使用codesandbox.io进行demo操作</mark></p>
-<pre><code class="language-js">import { render } from 'react-dom'
-import React from 'react'
-
-class Child extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      list: props.list
-    }
-  }
-
-  handleCilck = () =&gt; {
-    this.setState({
-      list: this.state.list.concat({ name: 'sarah' })
-    })
-  }
-
-  render() {
-    return (
-      &lt;div&gt;
-        &lt;button onClick={this.handleCilck}&gt;添加&lt;/button&gt;
-        {this.state.list.map((item, index) =&gt; {
-          return &lt;h1 key={index}&gt;Hello, {item.name}&lt;/h1&gt;
-        })}
-      &lt;/div&gt;
-    )
-  }
-}
-
-class Parent extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      list: [{ name: 'lily' }, { name: 'bob' }]
-    }
-  }
-
-  render() {
-    return (
-      &lt;div&gt;
-        &lt;Child list={this.state.list} /&gt;;
-      &lt;/div&gt;
-    )
-  }
-}
-
-render(&lt;Parent /&gt;, document.getElementById('root'))
-</code></pre>
-<p><strong>这个demo会产生一个问题，如果父组件传递给子组件的props改变了，子组件渲染的列表数据却不会对应发生改变。</strong></p>
-<p>原因：父组件更新导致子组件更新时，子组件的生命周期执行顺序如下：</p>
-<pre><code class="language-js">componentWillReceiveProps(UNSAFE_componentWillReceiveProps) 
-// componentWillReceiveProps is deprecated since React 16.9.0, use UNSAFE_componentWillReceiveProps instead
-shouldComponentUpdate
-componentWillUpdate
-render
-componentDidUpdate
-</code></pre>
-<p><mark><strong>也就是说子组件刷新的时候，父组件传递给子组件的props发生改变，引发子组件的render，并没有执行子组件的constructor函数，子组件没有被卸载自然不会重新加载，只会重新render，而如果父组件的props传递给子组件的state，那么子组件的state只会在第一次加载的时候被赋值，后续的父组件props变化并不会被赋值到子组件的state上，还是要理解组件的声明周期函数，以及各个函数在什么时候会被调用。</strong></mark></p>
-<p>解决方案：在UNSAFE_componentWillReceiveProps中重新对state赋值。</p>
-<pre><code class="language-js">UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState({
-      list: nextProps.list
-    })
-}
-
-</code></pre>
-<p>接着给子组件添加修改功能</p>
-<p>js部分:</p>
-<pre><code class="language-js">handleModify = () =&gt; {
-    let newArray = this.state.list
-    newArray[0].name = 'natasha'
-    this.setState({
-      list: newArray
-    })
-  }
-</code></pre>
-<p>jsx部分:</p>
-<pre><code class="language-html">&lt;button onClick={this.handleAdd}&gt;添加&lt;/button&gt;
-</code></pre>
-<p>如果直接这样做又会引发一个新的问题</p>
-<p>因为list是引用类型，这样更改的话，不仅更改了子组件自身的state，还更改了父组件传递进来的props，也就是父组件的state.list的值。</p>
-<p>因此在更改引用类型的数据时，应该采用浅拷贝或者深拷贝的方式</p>
-<p>三、总结</p>
-<p>总结以上demo实践，父组件用props赋值给子组件的state时，需要注意两点：</p>
-<p>1.在生命周期UNSAFE_componentWillReceiveProps中重新赋值</p>
-<p>2.用深拷贝创建不可变类型引用数据</p>
-<blockquote>
-<p>react官方文档讲的挺好</p>
-<p>参考资料：</p>
-<p><a href="https://www.azimiao.com/6316.html">文章一</a></p>
-<p><a href="https://www.jianshu.com/p/19c4dc3394f0">文章二</a></p>
-<p><a href="https://segmentfault.com/q/1010000008387645">文章三</a></p>
-<p><a href="https://blog.csdn.net/RuiKe1400360107/article/details/89554600">文章四</a></p>
-</blockquote>
 ]]></content>
     </entry>
 </feed>
