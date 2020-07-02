@@ -1,0 +1,245 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>event loop | 小潘的博客</title>
+<link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1593699495986">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://xiayun.im/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="event loop | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="单线程
+JavaScript语言的一大特点就是单线程，即同一时间只能做一件事情。
+JavaScript的单线程，与它的用途有关。作为浏览器脚本语言，JavaScript的主要用途是与用户互动，以及操作DOM。这决定了它只能是单线程，否则会带..." />
+    <meta name="keywords" content="js" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://xiayun.im">
+  <img class="avatar" src="https://xiayun.im/images/avatar.png?v=1593699495986" alt="">
+  </a>
+  <h1 class="site-title">
+    小潘的博客
+  </h1>
+  <p class="site-description">
+    平凡的世界
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Pxygogogo" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              event loop
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-04-16
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://xiayun.im/tag/js/" class="post-tag">
+                  # js
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="单线程">单线程</h2>
+<p>JavaScript语言的一大特点就是单线程，即同一时间只能做一件事情。</p>
+<p>JavaScript的单线程，与它的用途有关。作为浏览器脚本语言，JavaScript的主要用途是与用户互动，以及操作DOM。这决定了它只能是单线程，否则会带来很复杂的同步问题。比如，假定JavaScript同时有两个线程，一个线程在某个DOM节点上添加内容，另一个线程删除了这个节点，这时浏览器应该以哪个线程为准？<br>
+所以，为了避免复杂性，从一诞生，JavaScript就是单线程，这已经成了这门语言的核心特征，将来也不会改变。</p>
+<h1 id="event-loop-事件循环">event loop （事件循环）</h1>
+<p>event loop是一个执行模型，在不同的地方有不同的实现。浏览器和NodeJS基于不同的技术实现了各自的Event Loop。</p>
+<p>在JavaScript中，任务被分为两种，一种宏任务（MacroTask）也叫Task，一种叫微任务（MicroTask）。</p>
+<h3 id="macrotask-宏任务">MacroTask （宏任务）</h3>
+<p>script全部代码、setTimeout、setInterval、setImmediate、I/O、UI Rendering。</p>
+<h3 id="microtask-微任务">MicroTask （微任务）</h3>
+<p>Process.nextTick（Node独有）、Promise、Object.observe(废弃)、对 Dom 变化监听的MutationObserver</p>
+<h2 id="浏览器中的event-loop">浏览器中的Event Loop</h2>
+<p>Javascript 有一个 main thread 主线程和 call-stack 调用栈(执行栈)，所有的任务都会被放到调用栈等待主线程执行。</p>
+<h3 id="js调用栈">JS调用栈</h3>
+<p>JS调用栈采用的是后进先出的规则，当函数执行的时候，会被添加到栈的顶部，当执行栈执行完成后，就会从栈顶移出，直到栈内被清空。</p>
+<h3 id="同步任务和异步任务">同步任务和异步任务</h3>
+<p>Javascript单线程任务被分为同步任务和异步任务，同步任务会在调用栈中按照顺序等待主线程依次执行，异步任务会在异步任务有了结果后，将注册的回调函数放入任务队列中等待主线程空闲的时候（调用栈被清空），被读取到栈内等待主线程的执行。</p>
+<p>执行过程图：</p>
+<figure data-type="image" tabindex="1"><img src="https://s1.ax1x.com/2020/07/02/NLphxU.png" alt="image" loading="lazy"></figure>
+<ol>
+<li>首先js 是单线程运行的，在代码执行的时候，通过将不同函数的执行上下文压入执行栈中来保证代码的有序执行。</li>
+<li>在执行同步代码的时候，如果遇到了异步事件，js 引擎并不会一直等待其返回结果，而是会将这个事件挂起，继续执行执行栈中的其他任务</li>
+<li>当同步事件执行完毕后，再将异步事件对应的回调加入到与当前执行栈中不同的另一个任务队列中等待执行。</li>
+<li>任务队列可以分为宏任务对列和微任务队列，当当前执行栈中的事件执行完毕后，js  引擎首先会判断微任务对列中是否有任务可以执行，如果有就将微任务队首的事件压入栈中执行。</li>
+<li>当微任务对列中的任务都执行完成后再去判断宏任务对列中的任务。</li>
+</ol>
+<p>例：</p>
+<pre><code class="language-js">setTimeout(function() {
+  console.log(1)
+}, 0);
+new Promise(function(resolve, reject) {
+  console.log(2);
+  resolve()
+}).then(function() {
+  console.log(3)
+});
+process.nextTick(function () {
+  console.log(4)
+})
+console.log(5)
+</code></pre>
+<p>第一轮：主线程开始执行，遇到setTimeout，将setTimeout的回调函数丢到宏任务队列中，在往下执行new Promise立即执行，输出2，then的回调函数丢到微任务队列中，再继续执行，遇到process.nextTick，同样将回调函数扔到为任务队列，再继续执行，输出5，当所有同步任务执行完成后看有没有可以执行的微任务，发现有then函数和nextTick两个微任务，先执行哪个呢？process.nextTick指定的异步任务总是发生在所有异步任务之前，因此先执行process.nextTick输出4然后执行then函数输出3，第一轮执行结束。<br>
+第二轮：从宏任务队列开始，发现setTimeout回调，输出1执行完毕，因此结果是25431</p>
+<h2 id="nodejs的event-loop">NodeJS的Event Loop</h2>
+<p>参考：</p>
+<p><a href="https://juejin.im/post/5c337ae06fb9a049bc4cd218#heading-13">浏览器与Node的事件循环(Event Loop)有何区别?</a></p>
+<p><a href="https://juejin.im/post/5c3d8956e51d4511dc72c200#heading-25">一次弄懂Event Loop（彻底解决此类面试问题）</a></p>
+<p><a href="https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/">The Node.js Event Loop, Timers, and process.nextTick()</a></p>
+<p><a href="https://cnodejs.org/topic/5a9108d78d6e16e56bb80882">不要混淆nodejs和浏览器中的event loop</a></p>
+<p><a href="https://segmentfault.com/a/1190000015559210">JS浏览器事件循环机制</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%8D%95%E7%BA%BF%E7%A8%8B">单线程</a></li>
+</ul>
+</li>
+<li><a href="#event-loop-%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF">event loop （事件循环）</a><br>
+*
+<ul>
+<li><a href="#macrotask-%E5%AE%8F%E4%BB%BB%E5%8A%A1">MacroTask （宏任务）</a></li>
+<li><a href="#microtask-%E5%BE%AE%E4%BB%BB%E5%8A%A1">MicroTask （微任务）</a></li>
+<li><a href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B8%AD%E7%9A%84event-loop">浏览器中的Event Loop</a>
+<ul>
+<li><a href="#js%E8%B0%83%E7%94%A8%E6%A0%88">JS调用栈</a></li>
+<li><a href="#%E5%90%8C%E6%AD%A5%E4%BB%BB%E5%8A%A1%E5%92%8C%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1">同步任务和异步任务</a></li>
+</ul>
+</li>
+<li><a href="#nodejs%E7%9A%84event-loop">NodeJS的Event Loop</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://xiayun.im/post/css-unit/">
+              <h3 class="post-title">
+                css常见单位
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://xiayun.im/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
