@@ -2,26 +2,19 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>display none与visibility hidden的区别 | 小潘的博客</title>
+<title>window.location.href跳转问题 | 小潘的博客</title>
 <link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1593699314377">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://xiayun.im/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="display none与visibility hidden的区别 | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="window.location.href跳转问题 | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-    <meta name="description" content="
-面试题常考，以为自己足够理解，但第一次在真实场景中使用还是
-没有注意，记录之，自省！
-
-联系：它们都能让元素不可见
-区别：
-其一
-
-display:none 会让元素完全从渲染树中消失，渲染的时候不占据任何空间；
-visibility: ..." />
-    <meta name="keywords" content="css" />
+    <meta name="description" content="window.location.href的赋值，并不会中断Javascript的执行。
+因为 LocationChange 行为在浏览器内核中是起定时器异步执行的。
+异步执行的好处是为了防止代码调用过深，导致栈溢出，另外也是为了防止递归进入..." />
+    <meta name="keywords" content="js" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
@@ -87,63 +80,74 @@ visibility: ..." />
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              display none与visibility hidden的区别
+              window.location.href跳转问题
             </h2>
             <div class="post-info">
               <span>
-                2020-05-18
+                2020-07-02
               </span>
               <span>
-                2 min read
+                3 min read
               </span>
               
-                <a href="https://xiayun.im/tag/css/" class="post-tag">
-                  # css
+                <a href="https://xiayun.im/tag/js/" class="post-tag">
+                  # js
                 </a>
               
             </div>
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <blockquote>
-<p>面试题常考，以为自己足够理解，但第一次在真实场景中使用还是<br>
-没有注意，记录之，自省！</p>
+                <p>window.location.href的赋值，并不会中断Javascript的执行。</p>
+<p>因为 LocationChange 行为在浏览器内核中是起定时器异步执行的。<br>
+异步执行的好处是为了防止代码调用过深，导致栈溢出，另外也是为了防止递归进入加载逻辑，导致状态紊乱，保证导航请求是顺序执行的。</p>
+<p>所以最好在后面加上return这样的语句结束掉。但是return 也只是退出该语句所在的函数，而不会中断整个js文件的执行。<br>
+throw new Error()可以中断后面同步代码的执行。</p>
+<p>最近在做新项目上线后的异常治理，发现了一个频发的异常</p>
+<pre><code class="language-JS">Cannot read property 'XXX' of undefined 
+</code></pre>
+<p>而这些XXX其实都是解构接口返回的数据，项目中对于HTTP请求做了一层封装，在SSO认证时，没有认证的用户会跳转到SSO登录页。</p>
+<pre><code class="language-js">if (data.status === 401) {
+    window.location.href = ssoTargetUrl;
+    return Promise.resolve();
+}
+</code></pre>
+<p>由于是SPA应用，location.href并不会阻塞打包出来的单一js文件的继续执行，return语句也只会结束其所在函数。导致后续react的渲染进程实际上是在继续的，所以报了一堆类似的无法读取值的错误。</p>
+<p>思考到了三个解决方案:</p>
+<h4 id="方案一">方案一：</h4>
+<pre><code>在页面最开始进行渲染的地方预先发送一个请求以判断其是否登录，未登录则选择不渲染children的元素内容从而避免异常抛出。
+</code></pre>
+<p>优点： 统一拦截，如果没有登录，不会抛出异常</p>
+<p>缺点： 比较考验接口返回的时间，可能会影响首屏时间，几十到几百ms的波动代价</p>
+<h4 id="方案二">方案二：</h4>
+<pre><code>throw一个error并自定义成关注前端项目质量时相对没有那么注意的一种异常类别
+</code></pre>
+<p>优点：统一拦截，不会影响首屏时间</p>
+<p>缺点：以抛出另一种异常的形式来解决问题并不是一种完美的方式</p>
+<h4 id="方案三">方案三：</h4>
+<pre><code>在业务代码中做空值的判断处理
+</code></pre>
+<p>优点：</p>
+<p>缺点：改动量大，不能统一处理</p>
+<p>如果是你，你会选择哪一种呢？或者有何更好的办法？欢迎与我联系。</p>
+<blockquote>
+<p>参考: <a href="https://www.zhihu.com/question/29890952">window.location.href跳转页面详细过程是怎么样的？</a></p>
 </blockquote>
-<h2 id="联系它们都能让元素不可见">联系：它们都能让元素不可见</h2>
-<h2 id="区别">区别：</h2>
-<h3 id="其一">其一</h3>
-<ul>
-<li>display:none 会让元素完全从渲染树中消失，渲染的时候不占据任何空间；</li>
-<li>visibility: hidden;不会让元素从渲染树消失，渲染时元素继续占据空间，只是内容不可见</li>
-</ul>
-<h3 id="其二">其二</h3>
-<ul>
-<li>visibility:hidden; 使用该属性后，HTML元素（对象）仅仅是在视觉上看不见（完全透明），而它所占据的空间位置仍然存在，也即是说它仍具有高度、宽度等属性值。</li>
-<li>display:none; 使用该属性后，HTML元素（对象）的权度、高度等各种属性值都将“丢失”。</li>
-</ul>
-<h3 id="其三">其三</h3>
-<ul>
-<li>display: none;是非继承属性，子孙节点消失由于元素从渲染树消失造成，通过修改子孙节点属性无法显示；</li>
-<li>visibility: hidden;是继承属性，子孙节点消失由于继承了hidden，通过设置visibility: visible;可以让子孙节点显示</li>
-</ul>
-<h3 id="其四">其四</h3>
-<p>修改常规流中元素的display通常会造成文档重排。修改visibility属性只会造成本元素的重绘。</p>
-<h3 id="其五">其五</h3>
-<p>读屏器不会读取display: none;元素内容,会读取visibility: hidden;元素内容</p>
 
               </div>
               <div class="toc-container">
                 <ul class="markdownIt-TOC">
 <li>
 <ul>
-<li><a href="#%E8%81%94%E7%B3%BB%E5%AE%83%E4%BB%AC%E9%83%BD%E8%83%BD%E8%AE%A9%E5%85%83%E7%B4%A0%E4%B8%8D%E5%8F%AF%E8%A7%81">联系：它们都能让元素不可见</a></li>
-<li><a href="#%E5%8C%BA%E5%88%AB">区别：</a>
+<li>
 <ul>
-<li><a href="#%E5%85%B6%E4%B8%80">其一</a></li>
-<li><a href="#%E5%85%B6%E4%BA%8C">其二</a></li>
-<li><a href="#%E5%85%B6%E4%B8%89">其三</a></li>
-<li><a href="#%E5%85%B6%E5%9B%9B">其四</a></li>
-<li><a href="#%E5%85%B6%E4%BA%94">其五</a></li>
+<li>
+<ul>
+<li><a href="#%E6%96%B9%E6%A1%88%E4%B8%80">方案一：</a></li>
+<li><a href="#%E6%96%B9%E6%A1%88%E4%BA%8C">方案二：</a></li>
+<li><a href="#%E6%96%B9%E6%A1%88%E4%B8%89">方案三：</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -158,9 +162,9 @@ visibility: ..." />
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://xiayun.im/post/react-get-attribute/">
+            <a href="https://xiayun.im/post/git-branch/">
               <h3 class="post-title">
-                react中获取属性的问题
+                git从已有分支拉取新分支
               </h3>
             </a>
           </div>
