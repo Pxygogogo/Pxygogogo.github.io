@@ -2,21 +2,17 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>css常见单位 | 小潘的博客</title>
+<title>git stash（转） | 小潘的博客</title>
 <link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1595051757743">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://xiayun.im/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="css常见单位 | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="git stash（转） | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-    <meta name="description" content="常见单位
-
-px：像素相对长度单位，相对于显示器屏幕分辨率
-em：相对长度单位基准点为父节点字体的大小，如果自身定义了font-size按自身来计算（浏览器默认字体是16px），整个页面内1em不是一个固定的值。
-rem：相对单位可理解为”..." />
-    <meta name="keywords" content="css" />
+    <meta name="description" content="我们有时会遇到这样的情况，正在dev分支开发新功能，做到一半时有人过来反馈一个bug，让马上解决，但是新功能做到了一半你又不想提交，这时就可以使用git stash命令先把当前进度保存起来，然后切换到另一个分支去修改bug，修改完提交后，再..." />
+    <meta name="keywords" content="git" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
@@ -82,59 +78,61 @@ rem：相对单位可理解为”..." />
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              css常见单位
+              git stash（转）
             </h2>
             <div class="post-info">
               <span>
-                2020-04-16
+                2020-07-18
               </span>
               <span>
-                3 min read
+                2 min read
               </span>
               
-                <a href="https://xiayun.im/tag/css/" class="post-tag">
-                  # css
+                <a href="https://xiayun.im/tag/git/" class="post-tag">
+                  # git
                 </a>
               
             </div>
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <h2 id="常见单位">常见单位</h2>
-<ol>
-<li>px：像素相对长度单位，相对于显示器屏幕分辨率</li>
-<li>em：相对长度单位基准点为父节点字体的大小，如果自身定义了font-size按自身来计算（浏览器默认字体是16px），整个页面内1em不是一个固定的值。</li>
-<li>rem：相对单位可理解为”root em”, 相对根节点html的字体大小来计算，CSS3新加属性，chrome/firefox/IE9+支持。</li>
-<li>vw：viewpoint width，视窗宽度，1vw等于视窗宽度的1%。</li>
-<li>vh：viewpoint height，视窗高度，1vh等于视窗高度的1%。</li>
-<li>vmin：vw和vh中较小的那个。</li>
-<li>vmax：vw和vh中较大的那个。</li>
-<li>%:百分比</li>
-<li>in:寸</li>
-<li>cm:厘米</li>
-<li>mm:毫米</li>
-<li>pt:point，大约1/72寸</li>
-<li>pc:pica，大约6pt，1/6寸</li>
-<li>ex：取当前作用效果的字体的x的高度，在无法确定x高度的情况下以0.5em计算(IE11及以下均不支持，firefox/chrome/safari/opera/ios safari/android browser4.4+等均需属性加么有前缀)</li>
-<li>ch:以节点所使用字体中的“0”字符为基准，找不到时为0.5em(ie10+,chrome31+,safair7.1+,opera26+,ios safari 7.1+,android browser4.4+支持)</li>
-</ol>
-<h2 id="常用">常用</h2>
-<p>其中用的最多的单位是<strong>px、em、rem</strong>，这三个的区别是：<br>
-px是固定的像素，一旦设置了就无法因为适应页面大小而改变。</p>
-<p>em和rem相对于px更具有灵活性，他们是相对长度单位，意思是长度不是定死了的，更适用于响应式布局。</p>
-<p>对于em和rem的区别一句话概括：em相对于父元素，rem相对于根元素。</p>
-<p>rem中的r意思是root（根源），这也就不难理解了。</p>
-<p><mark>em/rem</mark>：用于做响应式页面，不过我更倾向于rem，因为em不同元素的参照物不一样（都是该元素父元素），所以在计算的时候不方便，相比之下rem就只有一个参照物（html元素），这样计算起来更清晰。</p>
-<p>关于vh/vw与%区别：<br>
-vh和vw大小是相对于视口的高度和宽度，而不是父元素的，%单位是相对于包含它的最近的父元素的高度和宽度。</p>
+                <p>我们有时会遇到这样的情况，正在dev分支开发新功能，做到一半时有人过来反馈一个bug，让马上解决，但是新功能做到了一半你又不想提交，这时就可以使用git stash命令先把当前进度保存起来，然后切换到另一个分支去修改bug，修改完提交后，再切回dev分支，使用git stash pop来恢复之前的进度继续开发新功能。下面来看一下git stash命令的常见用法</p>
+<h3 id="git-stash">git stash</h3>
+<p>保存当前工作进度，会把暂存区和工作区的改动保存起来。执行完这个命令后，在运行git status命令，就会发现当前是一个干净的工作区，没有任何改动。使用git stash save 'message...'可以添加一些注释</p>
+<h3 id="git-stash-list">git stash list</h3>
+<p>显示保存进度的列表。也就意味着，git stash命令可以多次执行。</p>
+<h3 id="git-stash-pop-index-stash_id">git stash pop [–index] [stash_id]</h3>
+<ul>
+<li><code>git stash pop</code> 恢复最新的进度到工作区。git默认会把工作区和暂存区的改动都恢复到工作区。</li>
+<li><code>git stash pop --index</code><br>
+恢复最新的进度到工作区和暂存区。（尝试将原来暂存区的改动还恢复到暂存区）</li>
+<li><code>stash pop stash@{1}</code>恢复指定的进度到工作区。stash_id是通过git stash list命令得到的<br>
+通过git stash pop命令恢复进度后，会删除当前进度。<br>
+git stash apply [–index] [stash_id]<br>
+除了不删除恢复的进度之外，其余和git stash pop 命令一样。</li>
+</ul>
+<h3 id="git-stash-drop-stash_id">git stash drop [stash_id]</h3>
+<p>删除一个存储的进度。如果不指定stash_id，则默认删除最新的存储进度。</p>
+<h3 id="git-stash-clear">git stash clear</h3>
+<p>删除所有存储的进度。</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/daguanjia11/article/details/73810577">原文</a></p>
+</blockquote>
 
               </div>
               <div class="toc-container">
                 <ul class="markdownIt-TOC">
 <li>
 <ul>
-<li><a href="#%E5%B8%B8%E8%A7%81%E5%8D%95%E4%BD%8D">常见单位</a></li>
-<li><a href="#%E5%B8%B8%E7%94%A8">常用</a></li>
+<li>
+<ul>
+<li><a href="#git-stash">git stash</a></li>
+<li><a href="#git-stash-list">git stash list</a></li>
+<li><a href="#git-stash-pop-index-stash_id">git stash pop [–index] [stash_id]</a></li>
+<li><a href="#git-stash-drop-stash_id">git stash drop [stash_id]</a></li>
+<li><a href="#git-stash-clear">git stash clear</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -147,9 +145,9 @@ vh和vw大小是相对于视口的高度和宽度，而不是父元素的，%单
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://xiayun.im/post/tp-composer/">
+            <a href="https://xiayun.im/post/js-scroll-fectch-more/">
               <h3 class="post-title">
-                zsh: no matches found不能指定版本
+                js上拉加载更多
               </h3>
             </a>
           </div>

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xiayun.im</id>
     <title>小潘的博客</title>
-    <updated>2020-07-18T05:55:31.311Z</updated>
+    <updated>2020-07-18T05:56:00.883Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xiayun.im"/>
     <link rel="self" href="https://xiayun.im/atom.xml"/>
@@ -10,6 +10,36 @@
     <logo>https://xiayun.im/images/avatar.png</logo>
     <icon>https://xiayun.im/favicon.ico</icon>
     <rights>All rights reserved 2020, 小潘的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[git stash（转）]]></title>
+        <id>https://xiayun.im/post/git-stash/</id>
+        <link href="https://xiayun.im/post/git-stash/">
+        </link>
+        <updated>2020-07-18T05:55:40.000Z</updated>
+        <content type="html"><![CDATA[<p>我们有时会遇到这样的情况，正在dev分支开发新功能，做到一半时有人过来反馈一个bug，让马上解决，但是新功能做到了一半你又不想提交，这时就可以使用git stash命令先把当前进度保存起来，然后切换到另一个分支去修改bug，修改完提交后，再切回dev分支，使用git stash pop来恢复之前的进度继续开发新功能。下面来看一下git stash命令的常见用法</p>
+<h3 id="git-stash">git stash</h3>
+<p>保存当前工作进度，会把暂存区和工作区的改动保存起来。执行完这个命令后，在运行git status命令，就会发现当前是一个干净的工作区，没有任何改动。使用git stash save 'message...'可以添加一些注释</p>
+<h3 id="git-stash-list">git stash list</h3>
+<p>显示保存进度的列表。也就意味着，git stash命令可以多次执行。</p>
+<h3 id="git-stash-pop-index-stash_id">git stash pop [–index] [stash_id]</h3>
+<ul>
+<li><code>git stash pop</code> 恢复最新的进度到工作区。git默认会把工作区和暂存区的改动都恢复到工作区。</li>
+<li><code>git stash pop --index</code><br>
+恢复最新的进度到工作区和暂存区。（尝试将原来暂存区的改动还恢复到暂存区）</li>
+<li><code>stash pop stash@{1}</code>恢复指定的进度到工作区。stash_id是通过git stash list命令得到的<br>
+通过git stash pop命令恢复进度后，会删除当前进度。<br>
+git stash apply [–index] [stash_id]<br>
+除了不删除恢复的进度之外，其余和git stash pop 命令一样。</li>
+</ul>
+<h3 id="git-stash-drop-stash_id">git stash drop [stash_id]</h3>
+<p>删除一个存储的进度。如果不指定stash_id，则默认删除最新的存储进度。</p>
+<h3 id="git-stash-clear">git stash clear</h3>
+<p>删除所有存储的进度。</p>
+<blockquote>
+<p><a href="https://blog.csdn.net/daguanjia11/article/details/73810577">原文</a></p>
+</blockquote>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[js上拉加载更多]]></title>
         <id>https://xiayun.im/post/js-scroll-fectch-more/</id>
@@ -482,168 +512,6 @@ class Example2 extends Component {
 <h5 id="这种朋友跟第一型的朋友一样少或然率相当之低">这种朋友，跟第一型的朋友一样少，或然率相当之低。</h5>
 <h5 id="这种人当然自有一套价值标准非但不会承认自己低级而无趣恐怕还自以为高级而有趣呢否则余不欲于之同乐矣">这种人当然自有一套价值标准，非但不会承认自己低级而无趣，恐怕还自以为高级而有趣呢？否则，余不欲于之同乐矣。</h5>
 <h5 id="亲爱的朋友你是第几型">亲爱的朋友你是第几型？</h5>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[js如何实现继承]]></title>
-        <id>https://xiayun.im/post/js-extends/</id>
-        <link href="https://xiayun.im/post/js-extends/">
-        </link>
-        <updated>2020-06-01T13:51:16.000Z</updated>
-        <content type="html"><![CDATA[<h3 id="写在前面">写在前面</h3>
-<p>继承是OO语言中的一个最为人津津乐道的概念。许多OO语言都支持两种继承方式：接口继承和实现继承。接口继承只继承方法签名，而实现继承则继承实际的方法。如前所述，由于函数没有签名，在ECMAScript中无法实现接口继承。ECMAScript只支持实现继承，而且其实现继承主要是依靠原型链来实现的。</p>
-<h3 id="1原型链">1.原型链</h3>
-<p>在 ECMAScript 中描述了原型链的概念，并将原型链作为实现继承的主要方法。其基本思想是利用原型让一个引用类型继承另一个引用类型的属性和方法。这一部分另写一篇文章总结，在此不展开了。</p>
-<p>缺点：</p>
-<ol>
-<li>
-<p>包含引用类型的原型属性会被所有实例属性共享，容易造成属性的修改混乱。</p>
-</li>
-<li>
-<p>在创建子类型的实例时，不能向超类型的构造函数中传递参数。</p>
-</li>
-</ol>
-<p>基于以上问题，在实践中很少会单独使用原型链。</p>
-<h3 id="2借用构造函数">2.借用构造函数</h3>
-<p>借用构造函数的思想主要是在子类型的构造函数中调用父类型构造函数。</p>
-<p>例：</p>
-<pre><code class="language-js">
-function SuperType(name){
-    this.name = name;
-}
-
-function SubType(){
-    // 集成了SuperType，同时还传递了参数
-    SuperType.call(this,'pxy');
-    
-    //实例属性
-    this.age = 22;
-}
-var instance = new SubType();
-alert(instance.name); // &quot;pxy&quot;
-alert(instance.age); // 22
-
-</code></pre>
-<p>优点：可以在子类型构造函数中向超类型构造函数添加参数</p>
-<p>缺点：和构造函数模式一样的问题，所有的方法都在构造函数中定义，因此就无法做到函数的复用。而且超类型的原型中定义的方法，对于子类型而言也是不可见的。</p>
-<p>基于以上问题，借用构造函数的技术也是很少单独使用的。</p>
-<h3 id="3组合继承">3.组合继承</h3>
-<pre><code class="language-js">function SuperType(name){
-    this.name = name
-    this.colors = [&quot;red&quot;, &quot;blue&quot;, &quot;green&quot;];
-}
-
-SuperType.prototype.sayName = function(){
-    console.log(this.name);
-}
-
-function SubType(name, age){
-    
-    //继承属性
-    SuperType.call(this,name);
-
-    this.age = age;
-}
-
-//继承方法
-SubType.prototype = new SuperType();
-SubType.prototype.constructor = SubType;
-SubType.prototype.sayAge = function(){
-    console.log(this.age);
-}
-
-var instance1 = new SubType(&quot;driss&quot;,9);
-instance1.colors.push(&quot;black&quot;);
-console.log(instance1.colors);  //&quot;red,blue,green,black&quot;
-instance1.sayName(); // &quot;driss&quot;
-instance1.sayAge(); // 9
-
-var instance2 = new SubType(&quot;pan&quot;,10);
-console.log(instance2.colors);  //&quot;red,blue,green&quot;
-instance2.sayName(); // &quot;pan&quot;
-instance2.sayAge(); // 10
-</code></pre>
-<p>优点：组合继承避免了原型链和借用构造函数的缺陷，融合了它们的优点，成为 JavaScript 中最常用的继承模式。而且，instanceof 和 isPropertyOf() 也能够用于识别基于组合继承创建的对象。</p>
-<p>缺点：调用了两次超类的构造函数，导致基类的原型对象中增添了不必要的超类的实例对象中的所有属性。</p>
-<h3 id="4原型式继承">4.原型式继承</h3>
-<p>原型式继承的主要思路是可以基于已有的对象创建新的对象，同时还不必因此创建自定义类型。</p>
-<p>例:</p>
-<pre><code class="language-js">function object(o){
-    function F(){};
-    F.prototype = o;
-    return new F();
-}
-</code></pre>
-<p>简单来说这个函数的作用就是，传入一个对象，返回一个原型对象为该对象的新对象。</p>
-<pre><code class="language-js">function object(o){
-    function F(){};
-    F.prototype = o;
-    return new F();
-}
-var person = {
-    name: 'pxy',
-    friends: ['tmk','cz','cyx']
-}
-
-var anotherPerson = object(person);
-anotherPerson.name = 'whg';
-anotherPerson.friends.push('wj');
-
-var anotherPerson2 = object(person);
-anotherPerson2.name = 'zsl';
-anotherPerson2.friends.push('wdw');
-
-console.log(person.friends); //[ 'tmk', 'cz', 'pyr', 'wj', 'wdw' ]
-
-</code></pre>
-<p>这种原型式继承，要求你必须有一个对象可以作为另一个对象的基础。如果有这么一个对象的话，可以把它传递给object()函数，然后再根据具体需求对得到的对象加以修改即可。在这个例子中，可以作为另一个对象基础的是person对象，于是我们把它传入到object()函数中，然后该函数就会返回一个新对象。这个新对象将person作为原型，所以它的原型中就包含一个基本类型值属性和一个引用类型值属性。这意味着person.friends不仅属于person所有，而且也会被anotherPerson以及anotherPerson2共享。实际上，这就相当于又创建了person对象的两个副本。</p>
-<p>ECMAScript 5中新增了 Object.create() 方法规范了原型式继承。这个方法接收两个参数，一个是将被用作新对象原型的对象，一个是为新对象定义额外属性的对象（可选）。</p>
-<p>注意第二个参数的格式与 Object.defineProperties() 方法的第二个参数格式相同。以这种方式指定的任何属性都会覆盖原型对象上的同名属性。在第二个参数为空的情况下，该方法与 object() 方法的行为相同。</p>
-<p>在没有必要兴师动众地创建构造函数，而只想让一个对象与另一个对象保持类似的情况下，原型式继承是完全可以胜任的</p>
-<p>优点：可以实现基于一个对象的简单继承，不必创建构造函数</p>
-<p>缺点：与原型链中提到的缺点相同，一个是传参的问题，一个是属性共享的问题。</p>
-<h3 id="5-寄生式继承">5. 寄生式继承</h3>
-<p>寄生式继承的思路与寄生构造函数和工厂模式类似，创建一个仅用于封装继承过程的函数，该函数在内部以某种方式增强对象，最后返回这个对象。</p>
-<pre><code class="language-js">function createAnother(original){
-    
-    var clone = object(original); //通过调用函数创建一个新对象
-    
-    clone.sayHi = function(){  // 某种方式增强这个对象
-        console.log(&quot;hi&quot;);
-    }
-
-    return clone;  // 返回这个对象
-}
-
-var person = {
-    name: &quot;james&quot;
-}
-
-var anotherPerson = createAnother(person);
-
-anotherPerson.sayHi(); // &quot;hi&quot;
-
-</code></pre>
-<p>这个例子中的代码基于person返回了一个新对象——anotherPerson。新对象不仅具有person的所有属性和方法，而且还有自己的sayHi()方法</p>
-<p>优点： 在主要考虑对象而不是自定义类型和构造函数的情况下，实现简单的继承。</p>
-<p>缺点：使用该继承方式，在为对象添加函数的时候，没有办法做到函数的复用。</p>
-<h3 id="6寄生式组合继承">6.寄生式组合继承</h3>
-<p>前面说过，组合继承是JavaScript最常用的继承模式；不过，它也有自己的不足。组合继承最大的问题就是无论什么情况下，都会调用两次超类型构造函数：一次是在创建子类型原型的时候，另一次是在子类型构造函数内部。没错，子类型最终会包含超类型对象的全部实例属性，但我们不得不在调用子类型构造函数时重写这些属性。</p>
-<p>寄生式组合继承就是用来解决这个问题，它与组合继承不同的地方主要是，在继承原型时，我们继承的不是超类的实例对象，而是原型对象是超类原型对象的一个实例对象，这样就解决了基类的原型对象中增添了不必要的超类的实例对象中的所有属性的问题。</p>
-<pre><code class="language-js">function inheritPrototype(subType, superType){
-
-    var prototype = object(superType.prototype); // 创建原型对象是超类原型对象的一个实例对象
-  
-    prototype.constructor = subType; // 弥补因为重写原型而失去的默认的 constructor 属性。
- 
-    subType.prototype = prototype; // 实现原型继承
-}
-</code></pre>
-<p>优点：效率高，避免了在 SubType.prototype 上创建不必要的属性。与此同时还能保持原型链不变，开发人员普遍认为寄生组合式继承是引用类型最理想的继承范式。</p>
-<blockquote>
-<p>参考：<br>
-JavaScript高级程序设计（第三版）</p>
-</blockquote>
 ]]></content>
     </entry>
 </feed>
