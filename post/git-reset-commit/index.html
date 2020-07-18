@@ -2,18 +2,21 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>如何正确给用户密码加密（转载） | 小潘的博客</title>
+<title>git 回退已经提交的commit（转） | 小潘的博客</title>
 <link rel="shortcut icon" href="https://xiayun.im/favicon.ico?v=1595051791057">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://xiayun.im/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="如何正确给用户密码加密（转载） | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="git 回退已经提交的commit（转） | 小潘的博客 - Atom Feed" href="https://xiayun.im/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-    <meta name="description" content="原文
-" />
-    <meta name="keywords" content="" />
+    <meta name="description" content="在使用git时，push到远端后发现commit了多余的文件，或者希望能够回退到以前的版本。
+先在本地回退到相应的版本：
+git reset --hard &lt;版本号&gt;
+// 注意使用 --hard 参数会抛弃当前工作区的修改
+/..." />
+    <meta name="keywords" content="git" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
@@ -79,21 +82,38 @@
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              如何正确给用户密码加密（转载）
+              git 回退已经提交的commit（转）
             </h2>
             <div class="post-info">
               <span>
-                2020-04-10
+                2020-07-18
               </span>
               <span>
                 1 min read
               </span>
               
+                <a href="https://xiayun.im/tag/git/" class="post-tag">
+                  # git
+                </a>
+              
             </div>
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <p><a href="https://www.infoq.cn/article/how-to-encrypt-the-user-password-correctly">原文</a></p>
+                <p>在使用git时，push到远端后发现commit了多余的文件，或者希望能够回退到以前的版本。</p>
+<p>先在本地回退到相应的版本：</p>
+<pre><code class="language-bash">git reset --hard &lt;版本号&gt;
+// 注意使用 --hard 参数会抛弃当前工作区的修改
+// 使用 --soft 参数的话会回退到之前的版本，但是保留当前工作区的修改，可以重新提交
+</code></pre>
+<p>如果此时使用命令：</p>
+<pre><code>git push origin &lt;分支名&gt;
+</code></pre>
+<p>会提示本地的版本落后于远端的版本；</p>
+<p>为了覆盖掉远端的版本信息，使远端的仓库也回退到相应的版本，需要加上参数--force</p>
+<pre><code>git push origin &lt;分支名&gt; --force
+</code></pre>
+<p><a href="https://blog.csdn.net/xs20691718/article/details/51901161">原文</a></p>
 
               </div>
               <div class="toc-container">
@@ -106,9 +126,9 @@
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://xiayun.im/post/https/">
+            <a href="https://xiayun.im/post/git-stash/">
               <h3 class="post-title">
-                https详解
+                git stash（转）
               </h3>
             </a>
           </div>
